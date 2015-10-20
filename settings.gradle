@@ -7,3 +7,7 @@ apply from: 'spa-core/settings.gradle'
 // include rest as new project
 include ':rest'
 project(':rest').projectDir = file('rest')
+
+// include api dummy as new project
+include ':api-dummy'
+project(':api-dummy').projectDir = file(':api-dummy')
