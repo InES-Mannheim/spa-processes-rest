@@ -1,0 +1,4 @@
+dependencies {
+   compile project(':api')
+   testCompile 'org.hamcrest:hamcrest-all:1.3'
+}
