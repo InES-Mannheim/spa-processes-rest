@@ -9,5 +9,5 @@ include ':rest'
 project(':rest').projectDir = file('rest')
 
 // include api dummy as new project
-include ':api-dummy'
-project(':api-dummy').projectDir = file('api-dummy')
+include ':api-simple'
+project(':api-simple').projectDir = file('api-simple')

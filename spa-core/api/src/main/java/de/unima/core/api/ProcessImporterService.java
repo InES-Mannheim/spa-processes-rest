@@ -1,6 +1,7 @@
 package de.unima.core.api;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for importing BPMN data into the application
@@ -26,7 +27,7 @@ public interface ProcessImporterService {
      * @param processId unique id of the process
      * @return Source with Process as BPMN file
      */
-    Source getById(String processId);
+    Optional<Source> getById(String processId);
     
     /**
      * Retrieves all process ids found for the given project.

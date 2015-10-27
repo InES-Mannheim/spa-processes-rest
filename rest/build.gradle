@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     compile project(':api') 
-    compile project(':api-dummy')
+    compile project(':api-simple')
    
     compile('org.springframework:spring-context:4.2.1.RELEASE')
     compile('org.springframework.boot:spring-boot-starter-data-rest')

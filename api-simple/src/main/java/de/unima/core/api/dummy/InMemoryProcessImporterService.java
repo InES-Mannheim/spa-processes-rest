@@ -6,15 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 import de.unima.core.api.ProcessImporterService;
 import de.unima.core.api.Source;
 
-public class DummyProcessImporterService implements ProcessImporterService{
+public class InMemoryProcessImporterService implements ProcessImporterService{
   
   private Map<String, Map<String, Source>> projects;
   
-  public DummyProcessImporterService(){
+  public InMemoryProcessImporterService(){
     projects = new HashMap<String, Map<String, Source>>();
     for(int i = 0; i < 5; i++){
       String tmpProjectID = "dummyProjectID"+i;
@@ -32,32 +40,36 @@ public class DummyProcessImporterService implements ProcessImporterService{
   }
   
   public String save(String projectId, Source source) {
-    if(projectId != null && !projectId.isEmpty() && source != null){
-      String processIdGenerated = "";
-      if(projects.containsKey(projectId)){
-        Map<String, Source> auxProcessMap = projects.get(projectId);
-        processIdGenerated = projectId+"-dummyProcessID"+Integer.toString(auxProcessMap.size()+1);
-        auxProcessMap.put(processIdGenerated, source);
-        projects.put(projectId, auxProcessMap);
-        return processIdGenerated;
-      } else {
-        // What happen when the project does not exist?
-      }
-    }
-    return null;
+		Preconditions.checkNotNull(source);
+		Preconditions.checkNotNull(projectId);
+		Preconditions.checkArgument(!projectId.isEmpty());
+		
+		final String processIdGenerated = generateProcessId(projectId);
+		final Map<String, Source> auxProcessMap = getNewOrExistingProcessesMap(projectId);
+		auxProcessMap.put(processIdGenerated, source);
+		projects.put(projectId, auxProcessMap);
+		return processIdGenerated;
   }
 
-  public Source getById(String processId) {
-    if(processId != null && !processId.isEmpty()){
-      for(Entry<String, Map<String, Source>> entryProject : projects.entrySet()){
-        for(Entry<String, Source> entryProcess : entryProject.getValue().entrySet()){
-          if(entryProcess.getKey().equalsIgnoreCase(processId)){
-            return entryProcess.getValue();
-          }
-        }
-      }
-    }
-    return null;
+  private String generateProcessId(String projectId){
+	  return projectId+"-dummyProcessID"+UUID.randomUUID();
+  }
+  
+  private Map<String, Source> getNewOrExistingProcessesMap(String projectId) {
+	  final Map<String, Source> projectProccesses = projects.get(projectId);
+	  return projectProccesses == null? Maps.newHashMap():projectProccesses;
+  }
+
+  public Optional<Source> getById(final String processId) {
+	Preconditions.checkNotNull(processId, "Process Id must not be null.");
+	Preconditions.checkState(!processId.isEmpty(), "Process Id must not be empty.");
+	
+	return projects.entrySet().stream()
+	.map(entries -> entries.getValue().entrySet())
+	.flatMap(entries -> entries.stream())
+	.filter(entry -> entry.getKey().equals(processId))
+	.findFirst()
+	.map(entry -> entry.getValue());
   }
 
   public List<String> getAll(String projectId) {
