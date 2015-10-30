@@ -39,84 +39,130 @@ public class InMemoryProcessImporterTest {
   @Test
   public void dummyProcessImporterShouldSaveTheProcessRetrievedFromSourceAndReturnsGeneratedID(){
     final String dummyProjectID = "dummyProjectID1";
-    final Source dummySource = new DummySource(new ByteArrayInputStream("dummyProcessID6".getBytes()));
+    final Source dummySource = new SimpleSource(new ByteArrayInputStream("dummyProcessID6".getBytes()));
     String processIDTest = service.save(dummyProjectID, dummySource);
     assertThat("The process ID should not be null", processIDTest, is(notNullValue()));
     assertThat("The process ID should not be empty", processIDTest, is(not("")));
-    assertThat("The process ID should be equal to 'dummyProjectID1-dummyProcessID6'", processIDTest, is(equalTo("dummyProjectID1-dummyProcessID6")));
+    assertThat("It should return a String with the process id generated", processIDTest, isA(String.class));
   }
   
   @Test
-  public void dummyProcessImporterShouldReturnNullForANullSource(){
+  public void itShouldReturnNullForANullSource(){
+    expected.expect(NullPointerException.class);
     final String dummyProjectID = "ProjectID";
     final Source dummySource = null;
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    String processIDTest = dummyProcessImporterService.save(dummyProjectID, dummySource);
-    assertThat("The process ID should be null", processIDTest, is(nullValue()));
+    service.save(dummyProjectID, dummySource);
   }
   
   @Test
-  public void itShouldReturnNullForANullOrEmptyProjectID(){
-    final String dummyEmptyProjectID = "";
+  public void itShouldReturnNullPointerExceptionForANullProjectID(){
+    expected.expect(NullPointerException.class);
     final String dummyNullProjectID = null;
     final Source dummySource = mock(Source.class);
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    String processIDEmptyTest = dummyProcessImporterService.save(dummyEmptyProjectID, dummySource);
-    String processIDNullTest = dummyProcessImporterService.save(dummyNullProjectID, dummySource);
-    assertThat("The process ID should be null for an empty project ID", processIDEmptyTest, is(nullValue()));
-    assertThat("The process ID should be null for a null project ID", processIDNullTest, is(nullValue()));
+    service.save(dummyNullProjectID, dummySource);
   }
   
   @Test
-  public void dummyProcessImporterShouldReturnTheSourceIdentifiedByProcessID() throws IOException{
+  public void itShouldReturnNullPointerExceptionForAnEmptyProjectID(){
+    expected.expect(IllegalArgumentException.class);
+    final String dummyEmptyProjectID = "";
+    final Source dummySource = mock(Source.class);
+    service.save(dummyEmptyProjectID, dummySource);
+  }
+  
+  @Test
+  public void itShouldReturnTheSourceIdentifiedByProcessID() throws IOException{
     final String dummyProcessID = "dummyProjectID1-dummyProcessID1";
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    Optional<Source> sourceTest = dummyProcessImporterService.getById(dummyProcessID);
-    assertThat("The source should not be null!", sourceTest, is(notNullValue()));
+    Optional<Source> sourceTest = service.getById(dummyProcessID);
     assertThat("The source should be a Source!", sourceTest.get(), isA(Source.class));
   }
   
   @Test
-  public void itShouldThrowExceptionForEmptyProcessID(){
+  public void itShouldThrowIllegalStateExceptionForEmptyProcessID(){
 	expected.expect(IllegalStateException.class);
     final String dummyEmptyProcessID = "";
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    dummyProcessImporterService.getById(dummyEmptyProcessID);
+    service.getById(dummyEmptyProcessID);
   }
   
   @Test
   public void itShouldThrowExceptionForNullProcessId(){
 	expected.expect(NullPointerException.class);
     final String dummyNullProcessID = null;
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    dummyProcessImporterService.getById(dummyNullProcessID);
+    service.getById(dummyNullProcessID);
   }
   
   @Test
-  public void dummyProcessImporterShouldReturnFiveProcessIDForAProjectID(){
+  public void itShouldReturnFiveProcessIDForAProjectID(){
     final String dummyProjectID = "dummyProjectID1";
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    List<String> listProcessIDTest = dummyProcessImporterService.getAll(dummyProjectID);
-    assertThat("The list should not be null!", listProcessIDTest, is(notNullValue()));
-    assertThat("The list should not be empty!", listProcessIDTest, is(not(empty())));
-    assertThat("The list should have 5 elements!", listProcessIDTest, hasSize(5));
-    assertThat("The list should have the elements 'dummyProjectID1-dummyProcessID1' to 'dummyProjectID1-dummyProcessID5'!", listProcessIDTest, hasItems("dummyProjectID1-dummyProcessID1", "dummyProjectID1-dummyProcessID2", "dummyProjectID1-dummyProcessID3", "dummyProjectID1-dummyProcessID4", "dummyProjectID1-dummyProcessID5"));
+    List<String> listProcessIDTest = service.getAll(dummyProjectID);
+    assertThat("The list should have 5 elements", listProcessIDTest, hasSize(5));
   }
   
-  public void dummyProcessImporterShouldReturnNullForEmptyOrNullProjectID(){
-    final String dummyEmptyProjectID = "";
+  @Test
+  public void itShouldThrowNullPointerExceptionForNullProjectID(){
+    expected.expect(NullPointerException.class);
     final String dummyNullProjectID = null;
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    List<String> listForEmptyProjectID = dummyProcessImporterService.getAll(dummyEmptyProjectID);
-    List<String> listForNullProjectID = dummyProcessImporterService.getAll(dummyNullProjectID);
-    assertThat("The list should be null!", listForEmptyProjectID, is(nullValue()));
-    assertThat("The list should be null!", listForNullProjectID, is(nullValue()));
+    service.getAll(dummyNullProjectID);
+  }
+  
+  @Test
+  public void itShouldThrowIllegalArgumentExceptionForEmptyProjectID(){
+    expected.expect(IllegalArgumentException.class);
+    final String dummyEmptyProjectID = "";
+    service.getAll(dummyEmptyProjectID);
   }
 
-  public void dummyProcessImporterShouldDeleteProcessWithID(){
+  @Test
+  public void itShouldReturnTrueForDeleteProcessWithID(){
     final String dummyProcessId = "dummyProjectID1-dummyProcessID2";
-    final InMemoryProcessImporterService dummyProcessImporterService = new InMemoryProcessImporterService();
-    boolean deleteTest = dummyProcessImporterService.deleteById(dummyProcessId);
-    
+    boolean deleteTest = service.deleteById(dummyProcessId);
+    assertThat("The return value should be True", deleteTest, is(true));
+  }
+  
+  @Test
+  public void itShouldReturnFalseForDeleteProcessWithNonExistentID(){
+    final String dummyProcessId = "nonExistentProcessID";
+    boolean deleteTest = service.deleteById(dummyProcessId);
+    assertThat("The return value should be True", deleteTest, is(false));
+  }
+  
+  @Test
+  public void itShouldThrowNullPointerExceptionForNullProcessID(){
+    expected.expect(NullPointerException.class);
+    final String dummyProcessId = null;
+    final Source dummySource = mock(Source.class);
+    service.updateById(dummyProcessId, dummySource);
+  }
+  
+  @Test
+  public void itShouldThrowNullPointerExceptionForNullSource(){
+    expected.expect(NullPointerException.class);
+    final String dummyProcessId = "notNullProcessID";
+    final Source dummySource = null;
+    service.updateById(dummyProcessId, dummySource);
+  }
+  
+  @Test
+  public void itShouldThrowIllegalArgumentExceptionForEmptyProcessID(){
+    expected.expect(IllegalArgumentException.class);
+    final String dummyProcessId = "";
+    final Source dummySource = mock(Source.class);
+    service.updateById(dummyProcessId, dummySource);
+  }
+  
+  @Test
+  public void itShouldFalseForNonExistentProcessID(){
+    final String dummyProcessId = "nonExistentProcessID";
+    final Source dummySource = mock(Source.class);
+    boolean returnTest = service.updateById(dummyProcessId, dummySource);
+    assertThat("The return should be false.", returnTest, is(equalTo(false)));
+  }
+  
+  @Test
+  public void itShouldReturnTrueForNonExistentProcessID(){
+    final String dummyProcessId = "dummyProjectID1-dummyProcessID1";
+    final Source dummySource = mock(Source.class);
+    boolean returnTest = service.updateById(dummyProcessId, dummySource);
+    assertThat("The return should be false.", returnTest, is(equalTo(true)));
   }
 }
