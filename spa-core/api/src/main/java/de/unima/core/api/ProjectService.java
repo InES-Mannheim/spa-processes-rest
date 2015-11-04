@@ -1,13 +1,13 @@
 package de.unima.core.api;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
- * Service for managing projects
+ * Service for managing projects.
  * 
- * @author Christian
- *
+ * @author Gregor Trefs
  */
 public interface ProjectService {
 
@@ -21,18 +21,44 @@ public interface ProjectService {
   String create(ProjectType type);
   
   /**
-   * Deletes project identified by given id.
-   * 
-   * @param processId id of the project
-   * @return true if successful, false otherwise
+   * Adds project.
+   *  
+   * @param projectId of the project
+   * @param type of the project
+   * @return true if project was added successfully; false otherwise
    */
-  boolean delete(String processId);
+  boolean add(String projectId, ProjectType type);
   
   /**
-   * Retrieves all project ids known to the application
+   * Deletes project.
+   * 
+   * @param projectId id of the project
+   * @return true if successful, false otherwise
+   */
+  boolean deleteById(String projectId);
+  
+  /**
+   * Finds project.
+   * 
+   * @param projectId of of the project
+   * @return the found project or empty
+   */
+  Optional<String> findById(String projectId);
+  
+  /**
+   * Retrieves all project ids.
    * 
    * @return ids of projects
    */
   List<String> listAll();
   
+  /**
+   * Searches for a project.
+   * 
+   * @param projectId of the project
+   * @return true if project exists; false otherwise
+   */
+  default boolean exists(String projectId) {
+	  return findById(projectId).isPresent();
+  }
 }

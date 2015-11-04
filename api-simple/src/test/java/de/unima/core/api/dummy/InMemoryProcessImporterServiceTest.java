@@ -1,14 +1,11 @@
 package de.unima.core.api.dummy;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -24,7 +21,7 @@ import org.junit.rules.ExpectedException;
 
 import de.unima.core.api.Source;
 
-public class InMemoryProcessImporterTest {
+public class InMemoryProcessImporterServiceTest {
 	
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -73,7 +70,7 @@ public class InMemoryProcessImporterTest {
   @Test
   public void itShouldReturnTheSourceIdentifiedByProcessID() throws IOException{
     final String dummyProcessID = "dummyProjectID1-dummyProcessID1";
-    Optional<Source> sourceTest = service.getById(dummyProcessID);
+    Optional<Source> sourceTest = service.load(dummyProcessID);
     assertThat("The source should be a Source!", sourceTest.get(), isA(Source.class));
   }
   
@@ -81,14 +78,14 @@ public class InMemoryProcessImporterTest {
   public void itShouldThrowIllegalStateExceptionForEmptyProcessID(){
 	expected.expect(IllegalStateException.class);
     final String dummyEmptyProcessID = "";
-    service.getById(dummyEmptyProcessID);
+    service.load(dummyEmptyProcessID);
   }
   
   @Test
   public void itShouldThrowExceptionForNullProcessId(){
 	expected.expect(NullPointerException.class);
     final String dummyNullProcessID = null;
-    service.getById(dummyNullProcessID);
+    service.load(dummyNullProcessID);
   }
   
   @Test

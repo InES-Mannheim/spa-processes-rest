@@ -1,16 +1,13 @@
 package de.unima.core.api.dummy;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import org.hamcrest.core.IsAnything;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,14 +31,14 @@ public class InMemoryProjectServiceTest {
   @Test
   public void dummyProjectServiceShouldReturnTrueForDeletingAnExistentProjectID(){
     final String dummyProcessID = "dummyProjectID1-dummyProcessID1";
-    final boolean resultTest = service.delete(dummyProcessID);
+    final boolean resultTest = service.deleteById(dummyProcessID);
     assertThat("The return value should be True.", resultTest, is(equalTo(true)));
   }
   
   @Test
   public void itShouldReturnFalseForDeletingANonExistentProjectID(){
     final String dummyProcessID = "nonExistentProcessID";
-    final boolean resultTest = service.delete(dummyProcessID);
+    final boolean resultTest = service.deleteById(dummyProcessID);
     assertThat("The return value should be False.", resultTest, is(equalTo(false)));
   }
   
@@ -49,14 +46,14 @@ public class InMemoryProjectServiceTest {
   public void itShouldThrowNullPointerExceptionForDeletingANullProjectID(){
     expected.expect(NullPointerException.class);
     final String dummyProcessID = null;
-    service.delete(dummyProcessID);
+    service.deleteById(dummyProcessID);
   }
   
   @Test
   public void itShouldThrowIllegalArgumentExceptionForDeletingAnEmptyProjectID(){
     expected.expect(IllegalArgumentException.class);
     final String dummyProcessID = "";
-    service.delete(dummyProcessID);
+    service.deleteById(dummyProcessID);
   }
   
   @Test
