@@ -1,19 +1,17 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.domain;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import de.unimannheim.spa.process.api.Source;
-
-public class SimpleSource implements Source {
+public class Source{
   
   private InputStream content;
   
-  public SimpleSource(){
+  public Source(){
     this.content = new ByteArrayInputStream("test".getBytes());
   }
   
-  public SimpleSource(InputStream content) {
+  public Source(InputStream content) {
     this.content = content;
   }
 

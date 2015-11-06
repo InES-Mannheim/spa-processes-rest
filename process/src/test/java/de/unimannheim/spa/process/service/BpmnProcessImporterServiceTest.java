@@ -1,6 +1,6 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.service;
 
-import static de.unima.core.api.dummy.InMemoryOps.creatRepoWith5ProjectsAnd5ProcessesEach;
+import static de.unimannheim.spa.process.service.InMemoryOps.creatRepoWith5ProjectsAnd5ProcessesEach;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.hamcrest.core.IsNot.not;
@@ -18,23 +18,25 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.unimannheim.spa.process.api.Source;
+import de.unimannheim.spa.process.domain.Source;
+import de.unimannheim.spa.process.service.BpmnProcessImporterService;
 
-public class InMemoryProcessImporterServiceTest {
+public class BpmnProcessImporterServiceTest {
 
 	@Rule
 	public ExpectedException expected = ExpectedException.none();
 
-	private InMemoryProcessImporterService service;
+	private BpmnProcessImporterService service;
 
 	@Before
 	public void setUp() {
-		service = new InMemoryProcessImporterService(creatRepoWith5ProjectsAnd5ProcessesEach());
+		service = new BpmnProcessImporterService(creatRepoWith5ProjectsAnd5ProcessesEach());
 	}
 
 	@Test
 	public void dummyProcessImporterShouldSaveTheProcessRetrievedFromSourceAndReturnsGeneratedID() {
 		final String dummyProjectID = "dummyProjectID1";
-		final Source dummySource = new SimpleSource(new ByteArrayInputStream("dummyProcessID6".getBytes()));
+		final Source dummySource = new Source(new ByteArrayInputStream("dummyProcessID6".getBytes()));
 		String processIDTest = service.importProcess(dummyProjectID, dummySource);
 		assertThat("The process ID should not be null", processIDTest, is(notNullValue()));
 		assertThat("The process ID should not be empty", processIDTest, is(not("")));

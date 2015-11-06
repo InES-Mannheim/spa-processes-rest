@@ -2,10 +2,10 @@ package de.unima.core.project.impl;
 
 import java.util.Set;
 
-import de.unima.core.api.ProjectType;
-import de.unima.core.api.Source;
 import de.unima.core.datamodel.DataStore;
 import de.unima.core.project.Project;
+import de.unimannheim.spa.process.api.ProjectType;
+import de.unimannheim.spa.process.api.Source;
 
 public class ProjectImpl implements Project {
   

@@ -1,7 +1,7 @@
 package de.unima.core.project;
 
-import de.unima.core.api.ProjectType;
-import de.unima.core.api.Source;
+import de.unimannheim.spa.process.api.ProjectType;
+import de.unimannheim.spa.process.api.Source;
 
 public interface Project {
 

@@ -1,26 +1,32 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.service;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
-import de.unimannheim.spa.process.api.BpmnProcessImporterService;
-import de.unimannheim.spa.process.api.Source;
+import de.unimannheim.spa.process.domain.Source;
 
-public class InMemoryProcessImporterService implements BpmnProcessImporterService {
+/**
+ * Service for importing BPMN
+ * 
+ * @author Gregor Trefs
+ */
+@Service
+public class BpmnProcessImporterService {
 
 	private final Map<String, Map<String, Source>> repo;
 
-	public InMemoryProcessImporterService(Map<String, Map<String, Source>> repo) {
+	public BpmnProcessImporterService(Map<String, Map<String, Source>> repo) {
 		Preconditions.checkNotNull(repo, "Repostiroy must not be empty.");
 		this.repo = repo;
 	}
 
-	@Override
-	public String importProcess(String projectId, Source source) {
+	public final String importProcess(String projectId, Source source) {
 		Preconditions.checkNotNull(source, "source must not be null.");
 		Preconditions.checkNotNull(projectId, "Project Id must not be null.");
 		Preconditions.checkArgument(!projectId.isEmpty(), "Project Id must not be empty.");
@@ -41,8 +47,7 @@ public class InMemoryProcessImporterService implements BpmnProcessImporterServic
 		return projectProccesses == null ? Maps.newHashMap() : projectProccesses;
 	}
 
-	@Override
-	public Optional<Source> exportProcess(final String processId) {
+	public final Optional<Source> exportProcess(final String processId) {
 		Preconditions.checkNotNull(processId, "Process Id must not be null.");
 		Preconditions.checkState(!processId.isEmpty(), "Process Id must not be empty.");
 

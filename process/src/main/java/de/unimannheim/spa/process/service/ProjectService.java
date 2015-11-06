@@ -1,4 +1,4 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.service;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -9,18 +9,19 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
-import de.unimannheim.spa.process.api.ProjectService;
-import de.unimannheim.spa.process.api.ProjectType;
-import de.unimannheim.spa.process.api.Source;
+import de.unimannheim.spa.process.domain.Source;
 
-public class InMemoryProjectService implements ProjectService {
+@Service
+public class ProjectService {
 
 	private Map<String, Map<String, Source>> projects;
 
-	public InMemoryProjectService() {
+	public ProjectService() {
 		projects = new HashMap<String, Map<String, Source>>();
 		for (int i = 0; i < 5; i++) {
 			String tmpProjectID = "dummyProjectID" + i;
@@ -28,15 +29,15 @@ public class InMemoryProjectService implements ProjectService {
 			Map<String, Source> dummyProcessMap = new HashMap<String, Source>();
 
 			dummyProcessMap.put(tmpProjectID + "-dummyProcessID1",
-					new SimpleSource(new ByteArrayInputStream("dummyProcessID1".getBytes())));
+					new Source(new ByteArrayInputStream("dummyProcessID1".getBytes())));
 			dummyProcessMap.put(tmpProjectID + "-dummyProcessID2",
-					new SimpleSource(new ByteArrayInputStream("dummyProcessID2".getBytes())));
+					new Source(new ByteArrayInputStream("dummyProcessID2".getBytes())));
 			dummyProcessMap.put(tmpProjectID + "-dummyProcessID3",
-					new SimpleSource(new ByteArrayInputStream("dummyProcessID3".getBytes())));
+					new Source(new ByteArrayInputStream("dummyProcessID3".getBytes())));
 			dummyProcessMap.put(tmpProjectID + "-dummyProcessID4",
-					new SimpleSource(new ByteArrayInputStream("dummyProcessID4".getBytes())));
+					new Source(new ByteArrayInputStream("dummyProcessID4".getBytes())));
 			dummyProcessMap.put(tmpProjectID + "-dummyProcessID5",
-					new SimpleSource(new ByteArrayInputStream("dummyProcessID5".getBytes())));
+					new Source(new ByteArrayInputStream("dummyProcessID5".getBytes())));
 
 			projects.put(tmpProjectID, dummyProcessMap);
 		}
@@ -71,13 +72,11 @@ public class InMemoryProjectService implements ProjectService {
 		return "Project-" + UUID.randomUUID();
 	}
 
-	@Override
 	public boolean add(String projectId, ProjectType type) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
 	public Optional<String> findById(String projectId) {
 		return listAll().stream().filter(projectId::equals).findFirst();
 	}

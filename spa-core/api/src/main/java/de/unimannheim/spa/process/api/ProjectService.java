@@ -1,4 +1,4 @@
-package de.unima.core.api;
+package de.unimannheim.spa.process.api;
 
 import java.util.List;
 import java.util.Optional;

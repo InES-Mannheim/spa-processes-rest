@@ -1,4 +1,4 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.service;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -14,18 +14,19 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.unimannheim.spa.process.api.ProjectType;
+import de.unimannheim.spa.process.service.ProjectService;
 
 
-public class InMemoryProjectServiceTest {
+public class ProjectServiceTest {
   
   @Rule
   public ExpectedException expected = ExpectedException.none();
   
-  private InMemoryProjectService service;
+  private ProjectService service;
   
   @Before
   public void setUp(){
-      service = new InMemoryProjectService();
+      service = new ProjectService();
   }
   
   @Test
@@ -58,7 +59,7 @@ public class InMemoryProjectServiceTest {
   
   @Test
   public void itShouldReturnAListWithFiveProjectsID(){
-    final InMemoryProjectService dummyProjectService = new InMemoryProjectService();
+    final ProjectService dummyProjectService = new ProjectService();
     final List<String> projectIDListTest = dummyProjectService.listAll();
     assertThat("The list should contain 5 elements.", projectIDListTest, hasSize(5));
   }

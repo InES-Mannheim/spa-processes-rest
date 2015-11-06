@@ -1,22 +1,26 @@
-package de.unima.core.api.dummy;
+package de.unimannheim.spa.process.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 
-import de.unimannheim.spa.process.api.ProcessService;
-import de.unimannheim.spa.process.api.Source;
+import de.unimannheim.spa.process.domain.Source;
 
-public class InMemoryProcessService implements ProcessService {
+/**
+ * Service for managing Processes
+ * 
+ * @author Gregor Trefs
+ */
+public class ProcessService {
 
 	private Map<String, Map<String, Source>> repo;
 
-	public InMemoryProcessService(Map<String, Map<String, Source>> repo) {
+	public ProcessService(Map<String, Map<String, Source>> repo) {
 		this.repo = repo;
 
 	}
@@ -46,7 +50,6 @@ public class InMemoryProcessService implements ProcessService {
 		return false;
 	}
 
-	@Override
 	public boolean updateById(String id, Source source) {
 		Preconditions.checkNotNull(id, "Process Id must not be null.");
 		Preconditions.checkArgument(!id.isEmpty(), "Process Id must not be empty.");
@@ -61,7 +64,6 @@ public class InMemoryProcessService implements ProcessService {
 				.isPresent();
 	}
 
-	@Override
 	public String create(String projectId, Source source) {
 		Preconditions.checkArgument(repo.containsKey(projectId), "Project does not exist.");
 		final String processId = generateProcessId(projectId);

@@ -1,6 +1,6 @@
 package de.unima.core.io;
 
-import de.unima.core.api.Source;
+import de.unimannheim.spa.process.api.Source;
 
 public interface Export {
 

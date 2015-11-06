@@ -1,4 +1,4 @@
-package de.unima.core.api;
+package de.unimannheim.spa.process.api;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ public interface BpmnProcessImporterService {
 	 * @throws IllegalArgumentException
 	 *             if source could not be read or project does not exist
 	 */
-	String save(String projectId, Source source);
+	String importProcess(String projectId, Source source);
 
 	/**
 	 * Loads process.
@@ -30,6 +30,6 @@ public interface BpmnProcessImporterService {
 	 * @return Source with Process in BPMN format or {@code Optional#empty()} if
 	 *         process is unknown
 	 */
-	Optional<Source> load(String processId);
+	Optional<Source> exportProcess(String processId);
 
 }

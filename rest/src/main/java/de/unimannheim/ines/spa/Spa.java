@@ -1,15 +1,15 @@
-package com.spa;
+package de.unimannheim.ines.spa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * SPA REST application provides a REST interfaces to SPA core.
+ * SPA application provides a REST interfaces to SPA processes.
  */
 @SpringBootApplication
-public class SpaRestApplication {
+public class Spa {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpaRestApplication.class, args);
+        SpringApplication.run(Spa.class, args);
     }
 }

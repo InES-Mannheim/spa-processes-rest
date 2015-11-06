@@ -1,7 +1,6 @@
-package de.unima.core.api;
+package de.unimannheim.spa.process.api;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service for managing Processes
@@ -11,14 +10,30 @@ import java.util.Optional;
 public interface ProcessService {
 
 	/**
-	 * Creates process in given project.
+	 * Creates process in given project. The source of the process is initially
+	 * empty and should be updated.
 	 * 
 	 * @param projectId
 	 *            id of the project
-	 * @return unique process Id or empty if project already exists
-	 * @throws IllegalArgumentException if project does not exist
+	 * @return unique process Id or empty if project exists
+	 * @throws IllegalArgumentException
+	 *             if project does not exist
 	 */
-	String create(String projectId);
+	default String create(String projectId) {
+		return create(projectId, Source.empty());
+	}
+	
+	/**
+	 * Creates process in given project. The source of the process is set to
+	 * the given source.
+	 * 
+	 * @param projectId id of the project
+	 * @param source where the proccess is stored
+	 * @return unique process Id or empty if project exists
+	 * @throws IllegalArgumentException
+	 *             if project does not exist
+	 */
+	String create(String projectId, Source source);
 
 	/**
 	 * Retrieves all processes found for the given project.
@@ -28,15 +43,6 @@ public interface ProcessService {
 	 * @return list of process ids or empty list if project does not exist
 	 */
 	List<String> getAll(String projectId);
-
-	/**
-	 * Finds process.
-	 * 
-	 * @param id
-	 *           of the process
-	 * @return the found process or empty
-	 */
-	Optional<String> findById(String id);
 
 	/**
 	 * Deletes process.
@@ -60,11 +66,12 @@ public interface ProcessService {
 	/**
 	 * Searches for a process.
 	 * 
-	 * @param id of the process
+	 * @param id
+	 *            of the process
 	 * @return true if present; false otherwise
 	 */
 	default boolean exists(String id) {
-		return findById(id).isPresent();
+		return getAll(id).contains(id);
 	}
 
 }
