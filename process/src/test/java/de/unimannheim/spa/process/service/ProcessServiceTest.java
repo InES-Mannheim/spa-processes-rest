@@ -1,7 +1,6 @@
 package de.unimannheim.spa.process.service;
 
 import static de.unimannheim.spa.process.service.InMemoryOps.creatRepoWith5ProjectsAnd5ProcessesEach;
-
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -18,7 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.unimannheim.spa.process.api.Source;
+import de.unimannheim.spa.process.domain.Source;
 
 public class ProcessServiceTest {
 
@@ -31,7 +30,8 @@ public class ProcessServiceTest {
 	
 	@Before
 	public void setUp() {
-		service = new ProcessService(creatRepoWith5ProjectsAnd5ProcessesEach());
+		repo = creatRepoWith5ProjectsAnd5ProcessesEach();
+		service = new ProcessService(repo);
 	}
 
 	@Test

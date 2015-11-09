@@ -64,6 +64,10 @@ public class ProcessService {
 				.isPresent();
 	}
 
+	public String create(String projectId) {
+		return create(projectId, Source.empty());
+	}
+	
 	public String create(String projectId, Source source) {
 		Preconditions.checkArgument(repo.containsKey(projectId), "Project does not exist.");
 		final String processId = generateProcessId(projectId);

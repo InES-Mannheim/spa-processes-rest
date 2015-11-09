@@ -1,7 +1,5 @@
 package de.unimannheim.spa.process.domain;
 
-import java.util.Objects;
-
 /**
  * General purpose interface identifying each implementing type as entity.
  * <p>
@@ -12,12 +10,4 @@ import java.util.Objects;
  */
 public interface Entity {
 	String getId();
-	
-	default boolean equals(Object obj) {
-		return Objects.equals(obj, this);
-	}
-	
-	default	int hashCode() {
-		return Objects.hash(getId());
-	}
 }

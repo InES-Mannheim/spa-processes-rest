@@ -7,7 +7,6 @@ import java.util.stream.IntStream;
 
 import com.google.common.collect.Maps;
 
-import de.unimannheim.spa.process.api.Source;
 import de.unimannheim.spa.process.domain.Source;
 
 public class InMemoryOps {

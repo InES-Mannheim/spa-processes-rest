@@ -13,9 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.unimannheim.spa.process.api.ProjectType;
-import de.unimannheim.spa.process.service.ProjectService;
-
 
 public class ProjectServiceTest {
   

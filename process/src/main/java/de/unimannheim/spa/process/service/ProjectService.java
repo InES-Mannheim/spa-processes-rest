@@ -62,7 +62,7 @@ public class ProjectService {
 	}
 
 	public String create(ProjectType type) {
-		Preconditions.checkNotNull("Type must not be null.", type);
+		Preconditions.checkNotNull(type, "Type must not be null.");
 		final String generatedProjectID = this.generateProjectId();
 		projects.put(generatedProjectID, Maps.newHashMap());
 		return generatedProjectID;

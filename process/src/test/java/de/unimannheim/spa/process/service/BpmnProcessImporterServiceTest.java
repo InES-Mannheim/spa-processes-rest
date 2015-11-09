@@ -17,9 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.unimannheim.spa.process.api.Source;
 import de.unimannheim.spa.process.domain.Source;
-import de.unimannheim.spa.process.service.BpmnProcessImporterService;
 
 public class BpmnProcessImporterServiceTest {
 
