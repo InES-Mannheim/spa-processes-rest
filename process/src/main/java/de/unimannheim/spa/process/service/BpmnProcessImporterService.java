@@ -16,7 +16,7 @@ import de.unimannheim.spa.process.domain.Source;
  * 
  * @author Gregor Trefs
  */
-@Service
+//@Service
 public class BpmnProcessImporterService {
 
 	private final Map<String, Map<String, Source>> repo;

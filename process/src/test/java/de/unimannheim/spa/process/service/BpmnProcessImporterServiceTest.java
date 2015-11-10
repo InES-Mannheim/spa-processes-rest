@@ -1,6 +1,6 @@
 package de.unimannheim.spa.process.service;
 
-import static de.unimannheim.spa.process.service.InMemoryOps.creatRepoWith5ProjectsAnd5ProcessesEach;
+import static de.unimannheim.spa.process.service.InMemoryOps.createRepoWith5ProjectsAnd5ProcessesEach;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.hamcrest.core.IsNot.not;
@@ -28,7 +28,7 @@ public class BpmnProcessImporterServiceTest {
 
 	@Before
 	public void setUp() {
-		service = new BpmnProcessImporterService(creatRepoWith5ProjectsAnd5ProcessesEach());
+		service = new BpmnProcessImporterService(createRepoWith5ProjectsAnd5ProcessesEach());
 	}
 
 	@Test

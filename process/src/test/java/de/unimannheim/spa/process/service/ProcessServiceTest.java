@@ -1,6 +1,6 @@
 package de.unimannheim.spa.process.service;
 
-import static de.unimannheim.spa.process.service.InMemoryOps.creatRepoWith5ProjectsAnd5ProcessesEach;
+import static de.unimannheim.spa.process.service.InMemoryOps.createRepoWith5ProjectsAnd5ProcessesEach;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -30,7 +30,7 @@ public class ProcessServiceTest {
 	
 	@Before
 	public void setUp() {
-		repo = creatRepoWith5ProjectsAnd5ProcessesEach();
+		repo = createRepoWith5ProjectsAnd5ProcessesEach();
 		service = new ProcessService(repo);
 	}
 

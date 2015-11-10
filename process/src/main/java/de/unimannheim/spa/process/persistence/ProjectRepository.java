@@ -1,5 +1,7 @@
 package de.unimannheim.spa.process.persistence;
 
-public interface ProjectRepository {
+import de.unimannheim.spa.process.domain.Project;
+
+public interface ProjectRepository extends Repository<String, Project> {
 
 }
