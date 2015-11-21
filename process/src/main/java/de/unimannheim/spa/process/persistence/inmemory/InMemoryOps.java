@@ -1,4 +1,4 @@
-package de.unimannheim.spa.process.service;
+package de.unimannheim.spa.process.persistence.inmemory;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
