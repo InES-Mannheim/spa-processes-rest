@@ -1,6 +1,6 @@
 package de.unimannheim.spa.process.service;
 
-import static de.unimannheim.spa.process.service.InMemoryOps.createRepoWith5ProjectsAnd5ProcessesEach;
+import static de.unimannheim.spa.process.persistence.inmemory.InMemoryOps.createRepoWith5ProjectsAnd5ProcessesEach;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.hamcrest.core.IsNot.not;

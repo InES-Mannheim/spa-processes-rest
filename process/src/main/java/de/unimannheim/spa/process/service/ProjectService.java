@@ -1,20 +1,27 @@
 package de.unimannheim.spa.process.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
 
 import de.unimannheim.spa.process.domain.Project;
+import de.unimannheim.spa.process.domain.Source;
 import de.unimannheim.spa.process.domain.Process;
 import de.unimannheim.spa.process.persistence.ProjectRepository;
 
 @Service
 public class ProjectService {
+  
+    private final String FOLDER_PATH = "processes/";
+    private final String FILE_EXTENSION = ".bpmn";
 
 	private final ProjectRepository repo;
 
@@ -50,5 +57,10 @@ public class ProjectService {
 
 	public Optional<Project> findById(String projectId) {
 		return listAll().stream().filter(project -> project.getId().equals(projectId)).findFirst();
+	}
+	
+	public Source getProcessFile(String projectID, String processID) throws IOException{
+	    FileSystemResource processFile = new FileSystemResource(new File(String.join("", FOLDER_PATH, processID, FILE_EXTENSION)));
+	    return new Source(processFile.getInputStream());
 	}
 }

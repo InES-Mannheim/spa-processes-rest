@@ -5,4 +5,5 @@ import de.unimannheim.spa.process.domain.Process;
 
 public interface ProjectRepository extends Repository<String, Project> {
   public boolean addProcess(String projectID, Process process);
+  public void deleteAll();
 }

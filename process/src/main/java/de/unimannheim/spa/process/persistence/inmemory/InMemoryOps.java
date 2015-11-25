@@ -34,12 +34,14 @@ public class InMemoryOps {
 				.entrySet()
 				.stream().map(projectToProcesses -> {
 					final Project project = new Project(projectToProcesses.getKey());
+					project.setLabel(String.join("-", projectToProcesses.getKey(), "label"));
 					project.setProcesses(projectToProcesses.getValue()
 							.entrySet()
 							.stream()
 							.map(processToResource -> {
 								final Process process = new Process(processToResource.getKey());
 								process.setSource(processToResource.getValue());
+								process.setLabel(String.join("-", processToResource.getKey(), "label"));
 								return process;
 							}).collect(Collectors.toList()));
 					return project;

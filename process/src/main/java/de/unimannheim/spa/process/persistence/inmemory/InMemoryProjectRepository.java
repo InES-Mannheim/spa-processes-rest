@@ -52,5 +52,11 @@ public class InMemoryProjectRepository implements ProjectRepository {
       }
       return false;
     }
+
+    @Override
+    public void deleteAll() {
+      this.memory.clear();
+      this.memory = InMemoryOps.create5ProjectsWith5ProcessesEach();
+    }
     
 }
