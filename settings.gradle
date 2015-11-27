@@ -4,14 +4,6 @@ rootProject.projectDir = file('spa-core')
 // apply settings from spa core
 apply from: 'spa-core/settings.gradle'
 
-// include rest as new project
-include ':rest'
-project(':rest').projectDir = file('rest')
-
-// include api dummy as new project
-include ':api-simple'
-project(':api-simple').projectDir = file('api-simple')
-
 // include process domain implementation
 include ':process'
 project(':process').projectDir = file('process')
