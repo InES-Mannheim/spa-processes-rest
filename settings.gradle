@@ -1,8 +1,8 @@
 // Reset root project to spa core.
-rootProject.projectDir = file('spa-core')
+rootProject.projectDir = file('core')
 
 // apply settings from spa core
-apply from: 'spa-core/settings.gradle'
+apply from: 'core/settings.gradle'
 
 // include process domain implementation
 include ':process'
