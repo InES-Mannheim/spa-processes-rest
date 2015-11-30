@@ -43,19 +43,18 @@ public class ProjectRestController {
   
   @Autowired
   public ProjectRestController(ProcessService processService, ProjectService projectService) {
-	this.processService = processService;
-	this.projectService = projectService;
+      this.processService = processService;
+      this.projectService = projectService;
   }
   
-  @ResponseStatus(HttpStatus.OK)
   @RequestMapping(method = RequestMethod.GET)
-  public List<Project> getAllProjects(){
-	  // TODO: Use ResponseEntity
-      return projectService.listAll();
+  public ResponseEntity<List<Project>> getAllProjects(){
+	  return ResponseEntity.ok()
+	                       .contentType(JSON_CONTENT_TYPE)
+	                       .body(projectService.listAll());
   }
   
-  // TODO: Alter route to /{projectID}/processes
-  @RequestMapping(value="/{projectID}", method = RequestMethod.GET)
+  @RequestMapping(value="/{projectID}/processes", method = RequestMethod.GET)
   public ResponseEntity<List<Process>> getAllProcesses(@PathVariable String projectID){
       return projectService.findById(projectID)
     		  .map(project -> project.getProcesses())
@@ -67,15 +66,14 @@ public class ProjectRestController {
                       .body(Collections.emptyList())); 
   }
   
-  @ResponseStatus(HttpStatus.CREATED)
   @RequestMapping(method = RequestMethod.POST)
-  public Project createProject(){
-	  // TODO: Use ResponseEntity
-      return new Project(projectService.create(ProjectType.BPMN));
+  public ResponseEntity<Project> createProject(){
+	  return ResponseEntity.status(HttpStatus.CREATED)
+	                       .contentType(JSON_CONTENT_TYPE)
+	                       .body(new Project(projectService.create(ProjectType.BPMN)));
   }
   
-  // TODO: Alter route to /{projectID}/processes
-  @RequestMapping(value="/{projectID}", method = RequestMethod.POST)
+  @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
   public ResponseEntity<Process> createProcessWithFile(@PathVariable("projectID") String projectID,
                                               @RequestParam("processID") String processID,
                                               @RequestParam("processLabel") String processLabel,
@@ -87,7 +85,6 @@ public class ProjectRestController {
                            .body(processCreated);
   }
   
-  @ResponseStatus(HttpStatus.OK)
   @RequestMapping(value="/{projectID}/processes/{processID}", method = RequestMethod.GET)
   public ResponseEntity<InputStreamResource> downloadProcessFile(@PathVariable("projectID") String projectID,
                                                                  @PathVariable("processID") String processID) throws IOException{

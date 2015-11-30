@@ -67,7 +67,7 @@ public class ProjectRestControllerTest {
     
     @Test
     public void itShouldReturn6ProcessesOfProjectID() throws Exception{
-        mockMvc.perform(get("/projects/"+PROJECT_ID_TO_TEST))
+        mockMvc.perform(get("/projects/"+PROJECT_ID_TO_TEST+"/processes"))
                .andExpect(status().isOk())
                .andExpect(content().contentType(jsonContentType))
                .andExpect(jsonPath("$", hasSize(5)));
@@ -75,7 +75,7 @@ public class ProjectRestControllerTest {
     
     @Test
     public void itShouldReturn0ProcessesOfNonExistentProjectID() throws Exception{
-        mockMvc.perform(get("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST))
+        mockMvc.perform(get("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes"))
                .andExpect(status().isNotFound())
                .andExpect(content().contentType(jsonContentType))
                .andExpect(jsonPath("$", hasSize(0)));
@@ -97,7 +97,7 @@ public class ProjectRestControllerTest {
         final String processLabelToTest = "newProcessLabelToTest";
         final String processURIToTest = "/projects/"+PROJECT_ID_TO_TEST+"/processes/"+processIDToTest;
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", new String("Test").getBytes());
-        mockMvc.perform(fileUpload("/projects/"+PROJECT_ID_TO_TEST).file(processFileToTest)
+        mockMvc.perform(fileUpload("/projects/"+PROJECT_ID_TO_TEST+"/processes").file(processFileToTest)
                                                                    .param("processID", processIDToTest)
                                                                    .param("processLabel", processLabelToTest))
                .andExpect(status().isCreated())
