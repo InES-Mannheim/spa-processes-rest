@@ -9,6 +9,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -67,26 +68,7 @@ public class ProjectServiceTest {
     final List<Project> toTest = service.listAll();
     assertThat("The size of the list should be 5.", toTest, hasSize(5));
   }
-  
-  @Test
-  public void itShouldCreateAProjectReceivingAProjectTypeAndReturnTheID(){
-    final String generateProjectIDTest = service.create(ProjectType.BPMN);
-    assertThat("The value returned should be an String.", generateProjectIDTest, isA(String.class));
-  }
 
-  @Test
-  public void itShouldReturn6ProjectsAfterCreatingANewProject(){
-    service.create(ProjectType.BPMN);
-    final List<Project> toTest = service.listAll();
-    assertThat("The size of the list should be 6.", toTest, hasSize(6));
-  }
-  
-  @Test
-  public void itShouldThrowNullPointerExceptionForCreateANullProjectType(){
-    expected.expect(NullPointerException.class);
-    service.create(null);
-  }
-  
   @Test
   public void itShouldReturnTrueForAddingANewProcessToProjectID(){
     final String dummyProjectID = "dummyProjectID1";
@@ -108,6 +90,25 @@ public class ProjectServiceTest {
     final String dummyProjectID = "dummyProjectID4";
     final Optional<Project> projectToTest = service.findById(dummyProjectID);
     assertThat("It should return an Optional<Project>", projectToTest, isA(Optional.class));
+  }
+  
+  @Test
+  public void itShouldCreateAProjectWithIDAndLabelAndReturnProjectIDCreated(){
+    final String projectIDToTest = "dummyProjectIDNew";
+    final String projectLabelToTest = "dummyProjectNewLabel";
+    final String projectIDExpected = service.create(projectIDToTest, projectLabelToTest, ProjectType.BPMN);
+    assertThat("It should return and String with ID of project created.", projectIDExpected, is(equalTo(projectIDToTest)));
+  }
+  
+  @Test
+  public void itShouldThrowExceptionWhenCreateNewProjectWithNullProjectIDNullProjectLabelAndNullType(){
+    expected.expect(NullPointerException.class);
+    service.create(null, null, null);
+  }
+  
+  @After
+  public void reInitializeRepo(){
+    service.deleteAll();
   }
 
 }

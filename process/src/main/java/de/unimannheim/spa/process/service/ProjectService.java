@@ -11,6 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import de.unimannheim.spa.process.domain.Project;
 import de.unimannheim.spa.process.domain.Source;
@@ -39,13 +40,18 @@ public class ProjectService {
 	public List<Project> listAll() {
 		return repo.getAll();
 	}
-
-	public String create(ProjectType type) {
-		Preconditions.checkNotNull(type, "Type must not be null.");
-		final String generatedProjectID = this.generateProjectId();
-		repo.save(new Project(generatedProjectID));
-		return generatedProjectID;
-	}
+	
+	public String create(String projectId, String projectLabel, ProjectType type){
+        Preconditions.checkNotNull(projectId, "projectID must not be null.");
+        Preconditions.checkNotNull(projectLabel, "processLabel must not be null.");
+        Preconditions.checkNotNull(type, "Type must not be null.");
+        if(Strings.isNullOrEmpty(projectId))
+          projectId = generateProjectId();
+        if(Strings.isNullOrEmpty(projectLabel))
+          projectLabel = String.join("-", projectId, "label");
+        Project newProject = new Project(projectId, projectLabel);
+        return repo.save(newProject)?newProject.getId():new String();
+    }
 
 	private String generateProjectId() {
 		return "Project-" + UUID.randomUUID();
@@ -62,5 +68,9 @@ public class ProjectService {
 	public Source getProcessFile(String projectID, String processID) throws IOException{
 	    FileSystemResource processFile = new FileSystemResource(new File(String.join("", FOLDER_PATH, processID, FILE_EXTENSION)));
 	    return new Source(processFile.getInputStream());
+	}
+	
+	public void deleteAll(){
+	  repo.deleteAll();
 	}
 }

@@ -19,8 +19,14 @@ public class Project implements Entity {
 	
 	public Project(String id) {
 		this.id = id;
-		this.processes = Lists.newArrayList();
 		this.label = String.join("-", id, "label");
+		this.processes = Lists.newArrayList();
+	}
+	
+	public Project(String id, String label){
+	  this.id = id;
+	  this.label = label;
+	  this.processes = Lists.newArrayList();
 	}
 	
 	public Project(String id, List<Process> processes){

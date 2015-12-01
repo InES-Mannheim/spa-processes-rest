@@ -83,11 +83,12 @@ public class ProjectRestControllerTest {
     
     @Test
     public void itShouldCreateAndReturnNewProject() throws Exception{
-        mockMvc.perform(post("/projects"))
+        mockMvc.perform(post("/projects").param("projectId", "ProjectId")
+                                         .param("projectLabel", "ProjectLabel"))
                .andExpect(status().isCreated())
                .andExpect(content().contentType(jsonContentType))
-               .andExpect(jsonPath("$.id", containsString("Project")))
-               .andExpect(jsonPath("$.label", containsString("-label")))
+               .andExpect(jsonPath("$.id", containsString("ProjectId")))
+               .andExpect(jsonPath("$.label", containsString("ProjectLabel")))
                .andExpect(jsonPath("$.processNumber", equalTo(0)));
     }
     

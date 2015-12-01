@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,10 +66,12 @@ public class ProjectRestController {
   }
   
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity<Project> createProject(){
+  public ResponseEntity<Project> createProject(@RequestParam String projectId,
+                                               @RequestParam String projectLabel){
+      String projectIDCreated = projectService.create(projectId, projectLabel, ProjectType.BPMN);
 	  return ResponseEntity.status(HttpStatus.CREATED)
 	                       .contentType(JSON_CONTENT_TYPE)
-	                       .body(new Project(projectService.create(ProjectType.BPMN)));
+	                       .body(projectService.findById(projectIDCreated).get());
   }
   
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
