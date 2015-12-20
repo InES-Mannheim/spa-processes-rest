@@ -6,6 +6,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 
 import java.nio.charset.Charset;
@@ -114,6 +115,18 @@ public class ProjectRestControllerTest {
         mockMvc.perform(get("/projects/"+PROJECT_ID_TO_TEST+"/processes/"+processIDToTest))
                .andExpect(status().isOk())
                .andExpect(content().contentType(octetStreamContentType));
+    }
+    
+    @Test
+    public void itShouldDeleteAnExistentProject() throws Exception{
+       mockMvc.perform(delete("/projects/"+PROJECT_ID_TO_TEST))
+              .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void itShouldReturn404ForDeletingANonExistentProject() throws Exception{
+       mockMvc.perform(delete("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST))
+              .andExpect(status().isNotFound());
     }
     
     @After

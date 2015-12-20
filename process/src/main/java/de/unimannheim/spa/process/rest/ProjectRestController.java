@@ -93,5 +93,10 @@ public class ProjectRestController {
                            .contentType(OCTET_STREAM_CONTENT_TYPE)
                            .body(new InputStreamResource(projectService.getProcessFile(projectID, processID).getContent()));
   }
+  
+  @RequestMapping(value="/{projectID}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> deleteProject(@PathVariable("projectID") String projectId){
+      return projectService.deleteById(projectId) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build(); 
+  }
 
 }
