@@ -70,6 +70,10 @@ public class ProjectService {
 	    return new Source(processFile.getInputStream());
 	}
 	
+	public boolean deleteProcess(String projectID, String processID){
+	    return repo.deleteProcess(projectID, processID);
+	}
+	
 	public void deleteAll(){
 	  repo.deleteAll();
 	}

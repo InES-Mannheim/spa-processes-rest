@@ -36,6 +36,8 @@ public class ProjectRestControllerTest {
   
     private final String PROJECT_ID_TO_TEST = "dummyProjectID1";
     private final String NON_EXISTENT_PROJECT_ID_TO_TEST = "nonExistentProjectID";
+    private final String PROJECT_PROCESS_ID_TO_TEST = "dummyProjectID1-dummyProcessID0";
+    private final String NON_EXISTENT_PROJECT_PROCESS_ID_TO_TEST = "nonExistentProjectProcessID";
   
     private MediaType jsonContentType = new MediaType(MediaType.APPLICATION_JSON.getType(), 
                                                   MediaType.APPLICATION_JSON.getSubtype(),
@@ -127,6 +129,18 @@ public class ProjectRestControllerTest {
     public void itShouldReturn404ForDeletingANonExistentProject() throws Exception{
        mockMvc.perform(delete("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST))
               .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    public void itShouldRemoveProcessFromProject() throws Exception{
+      mockMvc.perform(delete("/projects/"+PROJECT_ID_TO_TEST+"/processes/"+PROJECT_PROCESS_ID_TO_TEST))
+             .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void itShouldReturn404ForRemoveNonExistentProcessFromProject() throws Exception{
+      mockMvc.perform(delete("/projects/"+PROJECT_ID_TO_TEST+"/processes/"+NON_EXISTENT_PROJECT_PROCESS_ID_TO_TEST))
+             .andExpect(status().isNotFound());
     }
     
     @After

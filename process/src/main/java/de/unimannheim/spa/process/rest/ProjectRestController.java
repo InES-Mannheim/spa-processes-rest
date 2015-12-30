@@ -94,9 +94,15 @@ public class ProjectRestController {
                            .body(new InputStreamResource(projectService.getProcessFile(projectID, processID).getContent()));
   }
   
+  @RequestMapping(value="/{projectID}/processes/{processID}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> deleteProcessFromProject(@PathVariable("projectID") String projectID, 
+                                                       @PathVariable("processID") String processID){
+      return projectService.deleteProcess(projectID, processID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+  }
+  
   @RequestMapping(value="/{projectID}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> deleteProject(@PathVariable("projectID") String projectId){
-      return projectService.deleteById(projectId) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build(); 
+  public ResponseEntity<Void> deleteProject(@PathVariable("projectID") String projectID){
+      return projectService.deleteById(projectID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build(); 
   }
 
 }

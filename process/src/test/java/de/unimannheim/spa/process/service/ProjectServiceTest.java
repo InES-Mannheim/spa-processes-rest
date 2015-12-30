@@ -106,6 +106,30 @@ public class ProjectServiceTest {
     service.create(null, null, null);
   }
   
+  @Test
+  public void itShouldDeleteProcessFromProject(){
+    final String projectIDToTest = "dummyProjectID0";
+    final String processIDToTest = "dummyProjectID0-dummyProcessID0";
+    final boolean returnToTest = service.deleteProcess(projectIDToTest, processIDToTest);
+    assertThat("It should return true.", returnToTest, is(equalTo(true)));
+  }
+  
+  @Test
+  public void itShouldReturnFalseForDeleteNonExistentProcessFromProject(){
+    final String projectIDToTest = "dummyProjectID0";
+    final String processIDToTest = "nonExistentProcess";
+    final boolean returnToTest = service.deleteProcess(projectIDToTest, processIDToTest);
+    assertThat("It should return false for non existent process.", returnToTest, is(equalTo(false)));
+  }
+  
+  @Test
+  public void itShouldReturnFalseForDeleteNonExistentProcessFromNonExistentProject(){
+    final String projectIDToTest = "nonExistentProject";
+    final String processIDToTest = "nonExistentProcess";
+    final boolean returnToTest = service.deleteProcess(projectIDToTest, processIDToTest);
+    assertThat("It should return false for non existent project.", returnToTest, is(equalTo(false)));
+  }
+  
   @After
   public void reInitializeRepo(){
     service.deleteAll();

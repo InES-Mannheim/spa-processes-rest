@@ -58,5 +58,15 @@ public class InMemoryProjectRepository implements ProjectRepository {
       this.memory.clear();
       this.memory = InMemoryOps.create5ProjectsWith5ProcessesEach();
     }
+
+    @Override
+    public boolean deleteProcess(String projectID, String processID) {
+      return this.memory.stream().filter(project -> project.getId().equalsIgnoreCase(projectID))
+                                 .map(project -> project.getProcesses())
+                                 .collect(Collectors.toList())
+                                 .removeIf(processes -> {
+                                   return processes.removeIf(process -> process.getId().equalsIgnoreCase(processID));
+                                 });
+    }
     
 }
