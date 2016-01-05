@@ -14,6 +14,9 @@ local.properties
 .settings/
 .loadpath
 
+# Mac file
+.DS_Store
+
 # Eclipse Core
 .project
 
