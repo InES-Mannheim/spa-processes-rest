@@ -28,6 +28,8 @@ repositories {
 
 
 dependencies {
+    compile project(':core')
+    compile('org.springframework.data:spring-data-rest-webmvc:2.4.2.RELEASE')
     compile('org.springframework:spring-context:4.2.1.RELEASE')
     compile('org.springframework.boot:spring-boot-starter-data-rest'){
         exclude module: "spring-boot-starter-logging"
@@ -38,7 +40,7 @@ dependencies {
         exclude module: "logback-classic"
     }
     compile 'com.google.guava:guava:18.0'
-    
+
     testCompile('org.springframework.boot:spring-boot-starter-test'){
         exclude module: "spring-boot-starter-logging"
         exclude module: "logback-classic"
@@ -57,4 +59,3 @@ eclipse {
          containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
     }
 }
-
