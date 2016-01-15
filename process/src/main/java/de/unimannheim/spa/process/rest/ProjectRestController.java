@@ -1,6 +1,9 @@
 package de.unimannheim.spa.process.rest;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.json.JacksonSerializers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Charsets;
+import com.noodlesandwich.rekord.Rekord;
+import com.noodlesandwich.rekord.serialization.MapSerializer;
 
 import de.unima.core.application.SPA;
 import de.unima.core.domain.model.Project;
-import de.unimannheim.spa.process.dto.ProjectDTO;
+import de.unimannheim.spa.process.rekord.builders.ProjectBuilder;
 
 @RestController
 @RequestMapping("/projects")
@@ -31,13 +36,16 @@ public class ProjectRestController {
   }
   
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity<ProjectDTO> createProject(@RequestParam String projectLabel){
+  public ResponseEntity<Map<String, Object>> createProject(@RequestParam String projectLabel){
       Project projectCreated = spaService.createProject(projectLabel);
       spaService.saveProject(projectCreated);
-      ProjectDTO projectDTO = new ProjectDTO(projectCreated.getId(), projectCreated.getLabel(), projectCreated.getDataPools(), projectCreated.getLinkedSchemas());
-	  return ResponseEntity.status(HttpStatus.CREATED)
-	                       .contentType(JSON_CONTENT_TYPE)
-	                       .body(projectDTO);
+      Rekord<Project> pro = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
+                                                .with(ProjectBuilder.label, projectCreated.getLabel())
+                                                .with(ProjectBuilder.dataPools, projectCreated.getDataPools())
+                                                .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
+      return ResponseEntity.status(HttpStatus.CREATED)
+                           .contentType(JSON_CONTENT_TYPE)
+                           .body(pro.serialize(new MapSerializer()));
   }
   
 }

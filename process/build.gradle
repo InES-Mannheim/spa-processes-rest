@@ -40,6 +40,9 @@ dependencies {
         exclude module: "logback-classic"
     }
     compile 'com.google.guava:guava:18.0'
+    
+    compile 'com.noodlesandwich:rekord-core:0.3'
+    compile 'com.noodlesandwich:rekord-jackson:0.3'
 
     testCompile('org.springframework.boot:spring-boot-starter-test'){
         exclude module: "spring-boot-starter-logging"
