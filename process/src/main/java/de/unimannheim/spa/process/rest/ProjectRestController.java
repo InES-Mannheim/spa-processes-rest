@@ -1,5 +1,6 @@
 package de.unimannheim.spa.process.rest;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.noodlesandwich.rekord.Rekord;
 import com.noodlesandwich.rekord.serialization.MapSerializer;
 
@@ -32,6 +35,21 @@ public class ProjectRestController {
   @Autowired
   public ProjectRestController(SPA spaService) {
       this.spaService = spaService;
+  }
+  
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<Map<String, Object>>> getAllProjects(){
+      List<Map<String, Object>> allProjects = Lists.newArrayList();
+      for(Project project : spaService.findAllProjects()){
+        Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, project.getId())
+                                                   .with(ProjectBuilder.label, project.getLabel())
+                                                   .with(ProjectBuilder.dataPools, project.getDataPools())
+                                                   .with(ProjectBuilder.linkedSchemas, project.getLinkedSchemas());
+        allProjects.add(projectTmp.serialize(new MapSerializer()));
+      }
+      return ResponseEntity.ok()
+                           .contentType(JSON_CONTENT_TYPE)
+                           .body(allProjects);
   }
   
   @RequestMapping(method = RequestMethod.POST)
