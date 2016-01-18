@@ -1,29 +1,23 @@
 package de.unimannheim.spa.process.rest;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.base.Charsets;
+import com.noodlesandwich.rekord.Rekord;
+import com.noodlesandwich.rekord.serialization.MapSerializer;
 
-import de.unimannheim.spa.process.domain.Process;
-import de.unimannheim.spa.process.domain.Project;
-import de.unimannheim.spa.process.service.ProcessService;
-import de.unimannheim.spa.process.service.ProjectService;
-import de.unimannheim.spa.process.service.ProjectType;
+import de.unima.core.application.SPA;
+import de.unima.core.domain.model.Project;
+import de.unimannheim.spa.process.rekord.builders.ProjectBuilder;
 
 @RestController
 @RequestMapping("/projects")
@@ -33,76 +27,24 @@ public class ProjectRestController {
                                                     MediaType.APPLICATION_JSON.getSubtype(),
                                                     Charsets.UTF_8);
   
-  private final static MediaType OCTET_STREAM_CONTENT_TYPE = new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), 
-                                                           MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
-                                                           Charsets.UTF_8);
-  
-  private final ProjectService projectService;
-  private final ProcessService processService;
+  private final SPA spaService;
   
   @Autowired
-  public ProjectRestController(ProcessService processService, ProjectService projectService) {
-      this.processService = processService;
-      this.projectService = projectService;
-  }
-  
-  @RequestMapping(method = RequestMethod.GET)
-  public ResponseEntity<List<Project>> getAllProjects(){
-	  return ResponseEntity.ok()
-	                       .contentType(JSON_CONTENT_TYPE)
-	                       .body(projectService.listAll());
-  }
-  
-  @RequestMapping(value="/{projectID}/processes", method = RequestMethod.GET)
-  public ResponseEntity<List<Process>> getAllProcesses(@PathVariable String projectID){
-      return projectService.findById(projectID)
-    		  .map(project -> project.getProcesses())
-    		  .map(processes -> ResponseEntity.ok()
-                      .contentType(JSON_CONTENT_TYPE)
-                      .body(processes))
-    		  .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                      .contentType(JSON_CONTENT_TYPE)
-                      .body(Collections.emptyList())); 
+  public ProjectRestController(SPA spaService) {
+      this.spaService = spaService;
   }
   
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity<Project> createProject(@RequestParam String projectId,
-                                               @RequestParam String projectLabel){
-      String projectIDCreated = projectService.create(projectId, projectLabel, ProjectType.BPMN);
-	  return ResponseEntity.status(HttpStatus.CREATED)
-	                       .contentType(JSON_CONTENT_TYPE)
-	                       .body(projectService.findById(projectIDCreated).get());
-  }
-  
-  @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
-  public ResponseEntity<Process> createProcessWithFile(@PathVariable("projectID") String projectID,
-                                              @RequestParam("processID") String processID,
-                                              @RequestParam("processLabel") String processLabel,
-                                              @RequestPart("processFile") MultipartFile processFile){
-      Process processCreated = processService.create(projectID, processID, processLabel, processFile);
-      projectService.addProcess(projectID, processCreated, ProjectType.BPMN);
+  public ResponseEntity<Map<String, Object>> createProject(@RequestParam String projectLabel){
+      Project projectCreated = spaService.createProject(projectLabel);
+      spaService.saveProject(projectCreated);
+      Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
+                                                        .with(ProjectBuilder.label, projectCreated.getLabel())
+                                                        .with(ProjectBuilder.dataPools, projectCreated.getDataPools())
+                                                        .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
       return ResponseEntity.status(HttpStatus.CREATED)
                            .contentType(JSON_CONTENT_TYPE)
-                           .body(processCreated);
+                           .body(projectTmp.serialize(new MapSerializer()));
   }
   
-  @RequestMapping(value="/{projectID}/processes/{processID}", method = RequestMethod.GET)
-  public ResponseEntity<InputStreamResource> downloadProcessFile(@PathVariable("projectID") String projectID,
-                                                                 @PathVariable("processID") String processID) throws IOException{
-      return ResponseEntity.ok()
-                           .contentType(OCTET_STREAM_CONTENT_TYPE)
-                           .body(new InputStreamResource(projectService.getProcessFile(projectID, processID).getContent()));
-  }
-  
-  @RequestMapping(value="/{projectID}/processes/{processID}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> deleteProcessFromProject(@PathVariable("projectID") String projectID, 
-                                                       @PathVariable("processID") String processID){
-      return projectService.deleteProcess(projectID, processID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
-  }
-  
-  @RequestMapping(value="/{projectID}", method = RequestMethod.DELETE)
-  public ResponseEntity<Void> deleteProject(@PathVariable("projectID") String projectID){
-      return projectService.deleteById(projectID) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build(); 
-  }
-
 }

@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 
+import de.unima.core.application.SPA;
+import de.unima.core.application.local.LocalSPA;
+
 @Configuration
 @Profile("development")
 @ComponentScan("de.unimannheim.spa.process")
@@ -59,6 +62,11 @@ public class InMemoryConfig {
           public void destroy() {
           }
       });
+  }
+  
+  @Bean(name="SPA")
+  public SPA initSPAInSharedMemeoryBean(){
+    return LocalSPA.withDataInSharedMemory();
   }
   
   public static void main(String[] args) {
