@@ -1,9 +1,11 @@
 package de.unimannheim.spa.process.rest;
 
 import static org.hamcrest.core.Is.isA;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.nio.charset.Charset;
 import org.junit.Before;
@@ -39,6 +41,14 @@ public class ProjectRestControllerTest {
     @Before
     public void setUp(){
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+    
+    @Test
+    public void projectRestcontrollerShouldReturn6Projects() throws Exception{
+        mockMvc.perform(get("/projects"))
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(jsonContentType))
+               .andExpect(jsonPath("$", hasSize((greaterThanOrEqualTo(0)))));
     }
     
     @Test
