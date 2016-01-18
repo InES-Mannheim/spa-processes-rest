@@ -3,7 +3,6 @@ package de.unimannheim.spa.process.rest;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.JacksonSerializers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +38,13 @@ public class ProjectRestController {
   public ResponseEntity<Map<String, Object>> createProject(@RequestParam String projectLabel){
       Project projectCreated = spaService.createProject(projectLabel);
       spaService.saveProject(projectCreated);
-      Rekord<Project> pro = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
-                                                .with(ProjectBuilder.label, projectCreated.getLabel())
-                                                .with(ProjectBuilder.dataPools, projectCreated.getDataPools())
-                                                .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
+      Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
+                                                        .with(ProjectBuilder.label, projectCreated.getLabel())
+                                                        .with(ProjectBuilder.dataPools, projectCreated.getDataPools())
+                                                        .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
       return ResponseEntity.status(HttpStatus.CREATED)
                            .contentType(JSON_CONTENT_TYPE)
-                           .body(pro.serialize(new MapSerializer()));
+                           .body(projectTmp.serialize(new MapSerializer()));
   }
   
 }
