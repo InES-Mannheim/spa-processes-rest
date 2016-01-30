@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -94,29 +93,34 @@ public class ProjectRestController {
   }
   
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
-  public ResponseEntity<? extends DataBucket> createProcessWithFile(@PathVariable("projectID") String projectID,
+  public ResponseEntity<Object> createProcessWithFile(@PathVariable("projectID") String projectID,
                                                                     @RequestParam("processID") String processID,
                                                                     @RequestParam("processLabel") String processLabel,
+                                                                    @RequestParam("format") String format,
                                                                     @RequestPart("processFile") MultipartFile processFile) throws IllegalStateException, IOException{
-      return spaService.findProjectById(BASE_URL+projectID)
-                       .map(project -> {
-                                final DataPool dataPool = project.getDataPools().get(0);
-                                DataBucket process = null;
-                                try {
-                                  File fileToImport = FileUtils.convertMultipartToFile(processFile);
-                                  process = spaService.importData(fileToImport, "BPMN2", processLabel, dataPool);
-                                  fileToImport.delete();
-                                } catch (Exception e) {
-                                  e.printStackTrace();
-                                }
-                                return ResponseEntity.status(HttpStatus.CREATED)
-                                                     .contentType(JSON_CONTENT_TYPE)
-                                                     .body(process);
-                              })
-                       .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                                       .contentType(JSON_CONTENT_TYPE)
-                                       .body(null));
-      
+      ResponseEntity<Object> resp = null;
+      if(spaService.findProjectById(BASE_URL+projectID).isPresent()){
+        Project project = spaService.findProjectById(BASE_URL+projectID).get();
+        final DataPool dataPool = project.getDataPools().get(0);
+        File fileToImport = FileUtils.convertMultipartToFile(processFile);
+        DataBucket process = spaService.importData(fileToImport, format, processLabel, dataPool);
+        fileToImport.delete();
+        resp = ResponseEntity.status(HttpStatus.CREATED)
+                             .contentType(JSON_CONTENT_TYPE)
+                             .body(process);
+      } else {
+        resp = ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .contentType(JSON_CONTENT_TYPE)
+            .body(null); 
+      }      
+      return resp;
+  }
+  
+  @RequestMapping(value="/importformats", method = RequestMethod.GET)
+  public ResponseEntity<List<String>> getSupportedImportFormats(){
+      return ResponseEntity.status(HttpStatus.OK)
+                           .contentType(JSON_CONTENT_TYPE)
+                           .body(spaService.getSupportedImportFormats());
   }
   
 }

@@ -17,7 +17,9 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -29,6 +31,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.util.NestedServletException;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -46,7 +49,9 @@ import de.unimannheim.spa.process.config.InMemoryConfig;
 @WebAppConfiguration
 public class ProjectRestControllerTest {
   
-    private final String PROJECT_ID_TO_TEST = "http://www.uni-mannheim.de/spa/Project/2JwOpX";
+    @Rule
+    public ExpectedException expected = ExpectedException.none();
+  
     private final String NON_EXISTENT_PROJECT_ID_TO_TEST = "nonExistentProjectID";
     private final MediaType jsonContentType = new MediaType(MediaType.APPLICATION_JSON.getType(), 
                                                   MediaType.APPLICATION_JSON.getSubtype(),
@@ -123,7 +128,8 @@ public class ProjectRestControllerTest {
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         mockMvc.perform(fileUpload("/projects/"+projectIDForTest+"/processes").file(processFileToTest)
                                                                               .param("processID", processIDToTest)
-                                                                              .param("processLabel", processLabelToTest))
+                                                                              .param("processLabel", processLabelToTest)
+                                                                              .param("format", "BPMN2"))
                .andExpect(status().isCreated())
                .andExpect(content().contentType(jsonContentType))
                .andExpect(jsonPath("$.id", containsString("http://www.uni-mannheim.de/spa/DataBucket/")))
@@ -137,7 +143,8 @@ public class ProjectRestControllerTest {
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         mockMvc.perform(fileUpload("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes").file(processFileToTest)
                                                                               .param("processID", processIDToTest)
-                                                                              .param("processLabel", processLabelToTest))
+                                                                              .param("processLabel", processLabelToTest)
+                                                                              .param("format", "BPMN2"))
                 .andExpect(status().isNotFound());
     }
     
@@ -147,6 +154,32 @@ public class ProjectRestControllerTest {
       } catch (URISyntaxException e) {
           throw Throwables.propagate(e);
       }
+    }
+    
+    @Test
+    public void itShouldReturnTheSupportedInputFormats() throws Exception{
+        mockMvc.perform(get("/projects/importformats"))
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(jsonContentType))
+               .andExpect(jsonPath("$.[0]", equalTo("BPMN2")))
+               .andExpect(jsonPath("$.[1]", equalTo("RDF")))
+               .andExpect(jsonPath("$.[2]", equalTo("XES")))
+               .andExpect(jsonPath("$.[3]", equalTo("XSD")));
+    }
+    
+    @Test
+    public void itShouldReturn500ForCreatingAProcessWithUnsopportedFormat() throws Exception{
+        expected.expect(NestedServletException.class);
+        final String projectIDForTest = createProjectAndReturnID();
+        final String processIDToTest = "newProcessIDToTest";
+        final String processLabelToTest = "newProcessLabelToTest";
+        final String unsupportedFormat = "TXT";
+        MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
+        mockMvc.perform(fileUpload("/projects/"+projectIDForTest+"/processes").file(processFileToTest)
+                                                                              .param("processID", processIDToTest)
+                                                                              .param("processLabel", processLabelToTest)
+                                                                              .param("format", unsupportedFormat))
+               .andExpect(status().isInternalServerError());
     }
     
 }
