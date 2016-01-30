@@ -1,5 +1,6 @@
 package de.unimannheim.spa.process.rest;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,17 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.noodlesandwich.rekord.Rekord;
 import com.noodlesandwich.rekord.serialization.MapSerializer;
 
 import de.unima.core.application.SPA;
+import de.unima.core.domain.model.DataPool;
 import de.unima.core.domain.model.Project;
+import de.unimannheim.spa.process.rekord.builders.DataPoolBuilder;
 import de.unimannheim.spa.process.rekord.builders.ProjectBuilder;
 
 @RestController
 @RequestMapping("/projects")
 public class ProjectRestController {
+  
+  private final static String BASE_URL = "http://www.uni-mannheim.de/spa/Project/";
   
   private final static MediaType JSON_CONTENT_TYPE = new MediaType(MediaType.APPLICATION_JSON.getType(), 
                                                     MediaType.APPLICATION_JSON.getSubtype(),
@@ -43,7 +48,7 @@ public class ProjectRestController {
       for(Project project : spaService.findAllProjects()){
         Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, project.getId())
                                                    .with(ProjectBuilder.label, project.getLabel())
-                                                   .with(ProjectBuilder.dataPools, project.getDataPools())
+                                                   .with(ProjectBuilder.dataPools, DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, project.getDataPools().get(0).getDataBuckets()))
                                                    .with(ProjectBuilder.linkedSchemas, project.getLinkedSchemas());
         allProjects.add(projectTmp.serialize(new MapSerializer()));
       }
@@ -56,13 +61,29 @@ public class ProjectRestController {
   public ResponseEntity<Map<String, Object>> createProject(@RequestParam String projectLabel){
       Project projectCreated = spaService.createProject(projectLabel);
       spaService.saveProject(projectCreated);
+      spaService.createDataPool(projectCreated, "Default DataPool"); 
       Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
                                                         .with(ProjectBuilder.label, projectCreated.getLabel())
-                                                        .with(ProjectBuilder.dataPools, projectCreated.getDataPools())
+                                                        .with(ProjectBuilder.dataPools, DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, projectCreated.getDataPools().get(0).getDataBuckets()))
                                                         .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
       return ResponseEntity.status(HttpStatus.CREATED)
                            .contentType(JSON_CONTENT_TYPE)
                            .body(projectTmp.serialize(new MapSerializer()));
+  }
+  
+  @RequestMapping(value="/{projectID}/processes", method = RequestMethod.GET)
+  public ResponseEntity<Map<String, Object>> getAllProcesses(@PathVariable String projectID){
+      return spaService.findProjectById(BASE_URL+projectID)
+              .map(project -> project.getDataPools())
+              .map(processes -> {
+                Rekord<DataPool> dataPoolTmp = DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, processes.get(0).getDataBuckets());
+                return ResponseEntity.ok()
+                      .contentType(JSON_CONTENT_TYPE)
+                      .body(dataPoolTmp.serialize(new MapSerializer()));
+               })
+              .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                      .contentType(JSON_CONTENT_TYPE)
+                      .body(Collections.emptyMap())); 
   }
   
 }
