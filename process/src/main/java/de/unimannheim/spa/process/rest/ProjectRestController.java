@@ -94,7 +94,6 @@ public class ProjectRestController {
   
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
   public ResponseEntity<Object> createProcessWithFile(@PathVariable("projectID") String projectID,
-                                                                    @RequestParam("processID") String processID,
                                                                     @RequestParam("processLabel") String processLabel,
                                                                     @RequestParam("format") String format,
                                                                     @RequestPart("processFile") MultipartFile processFile) throws IllegalStateException, IOException{

@@ -123,11 +123,9 @@ public class ProjectRestControllerTest {
     @Test
     public void itShouldCreateAndReturnNewProcessWithFile() throws Exception{
         final String projectIDForTest = createProjectAndReturnID();
-        final String processIDToTest = "newProcessIDToTest";
         final String processLabelToTest = "newProcessLabelToTest";
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         mockMvc.perform(fileUpload("/projects/"+projectIDForTest+"/processes").file(processFileToTest)
-                                                                              .param("processID", processIDToTest)
                                                                               .param("processLabel", processLabelToTest)
                                                                               .param("format", "BPMN2"))
                .andExpect(status().isCreated())
@@ -138,11 +136,9 @@ public class ProjectRestControllerTest {
     
     @Test
     public void itShouldReturnNotFoundForCreatingAProcessInNonExistentProjectID() throws Exception{
-        final String processIDToTest = "newProcessIDToTest";
         final String processLabelToTest = "newProcessLabelToTest";
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         mockMvc.perform(fileUpload("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes").file(processFileToTest)
-                                                                              .param("processID", processIDToTest)
                                                                               .param("processLabel", processLabelToTest)
                                                                               .param("format", "BPMN2"))
                 .andExpect(status().isNotFound());
@@ -171,12 +167,10 @@ public class ProjectRestControllerTest {
     public void itShouldReturn500ForCreatingAProcessWithUnsopportedFormat() throws Exception{
         expected.expect(NestedServletException.class);
         final String projectIDForTest = createProjectAndReturnID();
-        final String processIDToTest = "newProcessIDToTest";
         final String processLabelToTest = "newProcessLabelToTest";
         final String unsupportedFormat = "TXT";
         MockMultipartFile processFileToTest = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         mockMvc.perform(fileUpload("/projects/"+projectIDForTest+"/processes").file(processFileToTest)
-                                                                              .param("processID", processIDToTest)
                                                                               .param("processLabel", processLabelToTest)
                                                                               .param("format", unsupportedFormat))
                .andExpect(status().isInternalServerError());
