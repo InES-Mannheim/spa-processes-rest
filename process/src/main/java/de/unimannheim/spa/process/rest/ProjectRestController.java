@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.noodlesandwich.rekord.Rekord;
 import com.noodlesandwich.rekord.serialization.MapSerializer;
@@ -133,21 +132,13 @@ public class ProjectRestController {
   public ResponseEntity<Void> deleteProcessFromProject(@PathVariable("projectID") String projectID, 
                                                        @PathVariable("processID") String processID){
       BodyBuilder resp = null;      
-      final Optional<Project> project = spaService.findProjectById(joinerOnEmpty.join(PROJECT_BASE_URL, projectID));
-      if(project.isPresent()){
-        Optional<DataPool> dataPool = Optional.ofNullable(project.get().getDataPools().get(0));
-        if(dataPool.isPresent()){
-          final Optional<DataBucket> dataBucketToRemove = dataPool.get().findDataBucketById(joinerOnEmpty.join(PROCESS_BASE_URL, processID));
-          if(dataBucketToRemove.isPresent()){
-            spaService.removeDataBucket(dataPool.get(), dataBucketToRemove.get());
-            resp = ResponseEntity.status(HttpStatus.OK)
-                                 .contentType(JSON_CONTENT_TYPE);
-          } else {
-            resp = ResponseEntity.status(HttpStatus.NOT_FOUND);
-          }
-        } else {
-          resp = ResponseEntity.status(HttpStatus.NOT_FOUND);
-        }
+      final Optional<DataPool> dataPool = spaService.findProjectById(joinerOnEmpty.join(PROJECT_BASE_URL, projectID))
+                                                    .map(project -> project.getDataPools().get(0));
+      final Optional<DataBucket> dataBucketToRemove = (dataPool.isPresent()) ? dataPool.get().findDataBucketById(joinerOnEmpty.join(PROCESS_BASE_URL, processID)) 
+                                                                             : Optional.empty();
+      if(dataPool.isPresent() && dataBucketToRemove.isPresent()){
+        spaService.removeDataBucket(dataPool.get(), dataBucketToRemove.get());
+        resp = ResponseEntity.status(HttpStatus.OK);
       } else {
         resp = ResponseEntity.status(HttpStatus.NOT_FOUND);
       }
