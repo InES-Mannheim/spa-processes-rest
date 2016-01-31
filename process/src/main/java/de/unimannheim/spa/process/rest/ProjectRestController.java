@@ -1,7 +1,9 @@
 package de.unimannheim.spa.process.rest;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.Optional;
 
 import org.apache.jena.ext.com.google.common.base.Joiner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -143,6 +147,32 @@ public class ProjectRestController {
         resp = ResponseEntity.status(HttpStatus.NOT_FOUND);
       }
       return resp.build();
+  }
+  
+  @RequestMapping(value = "/{projectID}/processes/{processID}/download", method = RequestMethod.GET, produces = "application/octet-stream")
+  public ResponseEntity<InputStreamResource> downloadProcessFile(@PathVariable("projectID") String projectID, 
+                                                                 @PathVariable("processID") String processID,
+                                                                 @RequestParam("format") String format) throws IOException {
+      HttpHeaders headers = new HttpHeaders();
+      headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+      headers.add("Pragma", "no-cache");
+      headers.add("Expires", "0");
+      
+      final Optional<DataPool> dataPool = spaService.findProjectById(joinerOnEmpty.join(PROJECT_BASE_URL, projectID))
+                                                    .map(project -> project.getDataPools().get(0));
+      final Optional<DataBucket> dataBucketToDownload = (dataPool.isPresent()) ? dataPool.get().findDataBucketById(joinerOnEmpty.join(PROCESS_BASE_URL, processID)) 
+                                                                               : Optional.empty();
+      final File processFile = Files.createTempFile(dataBucketToDownload.get().getLabel(), format).toFile();
+      
+      spaService.exportData(dataBucketToDownload.get(), format, processFile);
+      
+      headers.add("Content-Disposition", "attachment; filename=" + Joiner.on(".").join(processFile.getName(), format));
+      
+      return ResponseEntity.ok()
+                           .headers(headers)
+                           .contentLength(processFile.length())
+                           .contentType(MediaType.parseMediaType("application/octet-stream"))
+                           .body(new InputStreamResource(new FileInputStream(processFile)));
   }
   
 }
