@@ -176,4 +176,43 @@ public class ProjectRestControllerTest {
                .andExpect(status().isInternalServerError());
     }
     
+    @Test
+    public void itShouldReturnOkForRemovingAnExistentDataBucket() throws Exception{
+        final String projectIDForTest = createProjectAndReturnID();
+        final String processIDForTest = createProcessAndReturnID(projectIDForTest);
+        mockMvc.perform(delete("/projects/"+projectIDForTest+"/processes/"+processIDForTest))
+               .andExpect(status().isOk());
+    }
+    
+    private String createProcessAndReturnID(String projectID) throws Exception{
+        ObjectMapper mapper = new ObjectMapper();
+        String processCreatedID = "";
+        final String processLabel = "newProcessLabelToTest";
+        final String supportedFormat = "BPMN2";
+        MockMultipartFile processFile = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
+        String JSONFromServer = mockMvc.perform(fileUpload("/projects/"+projectID+"/processes").file(processFile)
+                                                                              .param("processLabel", processLabel)
+                                                                              .param("format", supportedFormat))
+                                       .andReturn()
+                                       .getResponse()
+                                       .getContentAsString();
+        try{
+          Map<String, Object> map = mapper.readValue(JSONFromServer, new TypeReference<Map<String, Object>>(){});
+          processCreatedID = ((String) map.get("id")).substring(42);
+        }catch (JsonGenerationException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return processCreatedID;
+    }
+    
+    @Test
+    public void itShouldReturnNotFoundForRemovingANonExistentProjectID() throws Exception{
+      final String processIDForTest = "NonExistentProcessID";
+      mockMvc.perform(delete("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes/"+processIDForTest))
+             .andExpect(status().isNotFound());
+    }
 }
