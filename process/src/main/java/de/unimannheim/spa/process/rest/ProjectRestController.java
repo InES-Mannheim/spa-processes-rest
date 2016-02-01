@@ -74,13 +74,17 @@ public class ProjectRestController {
       Project projectCreated = spaService.createProject(projectLabel);
       spaService.saveProject(projectCreated);
       spaService.createDataPool(projectCreated, "Default DataPool"); 
-      Rekord<Project> projectTmp = ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
-                                                        .with(ProjectBuilder.label, projectCreated.getLabel())
-                                                        .with(ProjectBuilder.dataPools, DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, projectCreated.getDataPools().get(0).getDataBuckets()))
-                                                        .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas());
       return ResponseEntity.status(HttpStatus.CREATED)
                            .contentType(JSON_CONTENT_TYPE)
-                           .body(projectTmp.serialize(new MapSerializer()));
+                           .body(serializeProject(projectCreated));
+  }
+  
+  private Map<String, Object> serializeProject(Project projectCreated) {
+      return ProjectBuilder.rekord.with(ProjectBuilder.id, projectCreated.getId())
+                                  .with(ProjectBuilder.label, projectCreated.getLabel())
+                                  .with(ProjectBuilder.dataPools, DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, projectCreated.getDataPools().get(0).getDataBuckets()))
+                                  .with(ProjectBuilder.linkedSchemas, projectCreated.getLinkedSchemas())
+                                  .serialize(new MapSerializer());
   }
   
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.GET)
@@ -88,14 +92,18 @@ public class ProjectRestController {
       return spaService.findProjectById(PROJECT_BASE_URL+projectID)
                        .map(project -> project.getDataPools())
                        .map(processes -> {
-                         Rekord<DataPool> dataPoolTmp = DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, processes.get(0).getDataBuckets());
                          return ResponseEntity.ok()
                                .contentType(JSON_CONTENT_TYPE)
-                               .body(dataPoolTmp.serialize(new MapSerializer()));
+                               .body(serializeDataPool(processes.get(0).getDataBuckets()));
                          })
                        .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                                .contentType(JSON_CONTENT_TYPE)
                                .body(Collections.emptyMap())); 
+  }
+  
+  private Map<String, Object> serializeDataPool(List<DataBucket> buckets){
+      return DataPoolBuilder.rekord.with(DataPoolBuilder.buckets, buckets)
+                                   .serialize(new MapSerializer());
   }
   
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.POST)
