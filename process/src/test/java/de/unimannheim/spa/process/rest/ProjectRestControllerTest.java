@@ -7,15 +7,18 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.junit.Assert.assertThat;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,9 +56,14 @@ public class ProjectRestControllerTest {
     public ExpectedException expected = ExpectedException.none();
   
     private final String NON_EXISTENT_PROJECT_ID_TO_TEST = "nonExistentProjectID";
-    private final MediaType jsonContentType = new MediaType(MediaType.APPLICATION_JSON.getType(), 
-                                                  MediaType.APPLICATION_JSON.getSubtype(),
-                                                  Charset.forName("utf8"));
+    
+    private final MediaType JSON_CONTENT_TYPE = new MediaType(MediaType.APPLICATION_JSON.getType(), 
+                                                    MediaType.APPLICATION_JSON.getSubtype(),
+                                                    Charset.forName("utf8"));
+    private final MediaType OCTET_CONTENT_TYPE = new MediaType(MediaType.APPLICATION_OCTET_STREAM.getType(), 
+                                                    MediaType.APPLICATION_OCTET_STREAM.getSubtype(),
+                                                    Charset.forName("utf8"));
+    
     
     private MockMvc mockMvc;
     
@@ -71,7 +79,7 @@ public class ProjectRestControllerTest {
     public void projectRestcontrollerShouldReturn6Projects() throws Exception{
         mockMvc.perform(get("/projects"))
                .andExpect(status().isOk())
-               .andExpect(content().contentType(jsonContentType))
+               .andExpect(content().contentType(JSON_CONTENT_TYPE))
                .andExpect(jsonPath("$", hasSize((greaterThanOrEqualTo(0)))));
     }
     
@@ -79,7 +87,7 @@ public class ProjectRestControllerTest {
     public void itShouldCreateAndReturnNewProject() throws Exception{
         mockMvc.perform(post("/projects").param("projectLabel", "ProjectLabel"))
                .andExpect(status().isCreated())
-               .andExpect(content().contentType(jsonContentType))
+               .andExpect(content().contentType(JSON_CONTENT_TYPE))
                .andExpect(jsonPath("$.id", isA(String.class)))
                .andExpect(jsonPath("$.label", containsString("ProjectLabel")));
     }
@@ -89,11 +97,11 @@ public class ProjectRestControllerTest {
         final String projectIDForTest = createProjectAndReturnID();
         mockMvc.perform(get("/projects/"+projectIDForTest+"/processes"))
                .andExpect(status().isOk())
-               .andExpect(content().contentType(jsonContentType))
+               .andExpect(content().contentType(JSON_CONTENT_TYPE))
                .andExpect(jsonPath("$.buckets", hasSize(0)));
     }
     
-    private String createProjectAndReturnID() throws UnsupportedEncodingException, Exception{
+    private String createProjectAndReturnID() throws Exception{
         ObjectMapper mapper = new ObjectMapper();
         String JSONFromServer = mockMvc.perform(post("/projects").param("projectLabel", "ProjectLabel"))
                                                                  .andReturn()
@@ -117,7 +125,7 @@ public class ProjectRestControllerTest {
     public void itShouldReturn0ProcessesOfNonExistentProjectID() throws Exception{
         mockMvc.perform(get("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes"))
                .andExpect(status().isNotFound())
-               .andExpect(content().contentType(jsonContentType));
+               .andExpect(content().contentType(JSON_CONTENT_TYPE));
     }
     
     @Test
@@ -129,7 +137,7 @@ public class ProjectRestControllerTest {
                                                                               .param("processLabel", processLabelToTest)
                                                                               .param("format", "BPMN2"))
                .andExpect(status().isCreated())
-               .andExpect(content().contentType(jsonContentType))
+               .andExpect(content().contentType(JSON_CONTENT_TYPE))
                .andExpect(jsonPath("$.id", containsString("http://www.uni-mannheim.de/spa/DataBucket/")))
                .andExpect(jsonPath("$.label", equalTo(processLabelToTest)));
     }
@@ -156,7 +164,7 @@ public class ProjectRestControllerTest {
     public void itShouldReturnTheSupportedInputFormats() throws Exception{
         mockMvc.perform(get("/projects/importformats"))
                .andExpect(status().isOk())
-               .andExpect(content().contentType(jsonContentType))
+               .andExpect(content().contentType(JSON_CONTENT_TYPE))
                .andExpect(jsonPath("$.[0]", equalTo("BPMN2")))
                .andExpect(jsonPath("$.[1]", equalTo("RDF")))
                .andExpect(jsonPath("$.[2]", equalTo("XES")))
@@ -179,20 +187,19 @@ public class ProjectRestControllerTest {
     @Test
     public void itShouldReturnOkForRemovingAnExistentDataBucket() throws Exception{
         final String projectIDForTest = createProjectAndReturnID();
-        final String processIDForTest = createProcessAndReturnID(projectIDForTest);
+        final String processIDForTest = createProcessAndReturnID(projectIDForTest, "BPMN2");
         mockMvc.perform(delete("/projects/"+projectIDForTest+"/processes/"+processIDForTest))
                .andExpect(status().isOk());
     }
     
-    private String createProcessAndReturnID(String projectID) throws Exception{
+    private String createProcessAndReturnID(String projectID, String format) throws Exception{
         ObjectMapper mapper = new ObjectMapper();
         String processCreatedID = "";
         final String processLabel = "newProcessLabelToTest";
-        final String supportedFormat = "BPMN2";
-        MockMultipartFile processFile = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.MULTIPART_FORM_DATA_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
+        MockMultipartFile processFile = new MockMultipartFile("processFile", "example-spa.bpmn", MediaType.APPLICATION_OCTET_STREAM_VALUE, Files.toByteArray(getFilePath("example-spa.bpmn").toFile()));
         String JSONFromServer = mockMvc.perform(fileUpload("/projects/"+projectID+"/processes").file(processFile)
                                                                               .param("processLabel", processLabel)
-                                                                              .param("format", supportedFormat))
+                                                                              .param("format", format))
                                        .andReturn()
                                        .getResponse()
                                        .getContentAsString();
@@ -214,5 +221,15 @@ public class ProjectRestControllerTest {
       final String processIDForTest = "NonExistentProcessID";
       mockMvc.perform(delete("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST+"/processes/"+processIDForTest))
              .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    public void itShouldReturnProcessFileWithSpecificFormat() throws Exception{
+      final String formatForTest = "BPMN2";
+      final String projectIDForTest = createProjectAndReturnID();
+      final String processIDForTest = createProcessAndReturnID(projectIDForTest, formatForTest);
+      mockMvc.perform(get("/projects/"+projectIDForTest+"/processes/"+processIDForTest+"/download").param("format", formatForTest))
+             .andExpect(status().isOk())
+             .andExpect(content().contentType(OCTET_CONTENT_TYPE));
     }
 }
