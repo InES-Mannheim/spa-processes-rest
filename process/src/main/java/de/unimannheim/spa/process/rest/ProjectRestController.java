@@ -159,10 +159,9 @@ public class ProjectRestController {
       return resp.build();
   }
   
-  @RequestMapping(value = "/{projectID}/processes/{processID}/download", method = RequestMethod.GET, produces = "application/octet-stream")
+  @RequestMapping(value = "/{projectID}/processes/{processID}", method = RequestMethod.GET, produces = "application/octet-stream")
   public ResponseEntity<InputStreamResource> downloadProcessFile(@PathVariable("projectID") String projectID, 
-                                                                 @PathVariable("processID") String processID,
-                                                                 @RequestParam("format") String format) throws IOException {
+                                                                 @PathVariable("processID") String processID) throws IOException {
       HttpHeaders headers = new HttpHeaders();
       headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
       headers.add("Pragma", "no-cache");
@@ -172,27 +171,18 @@ public class ProjectRestController {
                                                     .map(project -> project.getDataPools().get(0));
       final Optional<DataBucket> dataBucketToDownload = (dataPool.isPresent()) ? dataPool.get().findDataBucketById(PROCESS_BASE_URL + processID) 
                                                                                : Optional.empty();
-      final File processFile = Files.createTempFile(dataBucketToDownload.get().getLabel(), format).toFile();
+      final File processFile = Files.createTempFile(dataBucketToDownload.get().getLabel(), "").toFile();
       
-      spaService.exportData(dataBucketToDownload.get(), format, processFile);
+      spaService.exportData(dataBucketToDownload.get(), "BPMN2", processFile);
       
-      headers.add("Content-Disposition", "attachment; filename=" + processFile.getName() + "." + getExtensionFrom(format));
+      headers.add("Content-Disposition", "attachment; filename=" + processFile.getName() + ".bpmn");
+      headers.add("Access-Control-Expose-Headers", "Content-Disposition");
       
       return ResponseEntity.ok()
                            .headers(headers)
                            .contentLength(processFile.length())
                            .contentType(OCTET_CONTENT_TYPE)
                            .body(new InputStreamResource(new FileInputStream(processFile)));
-  }
-  
-  
-  private String getExtensionFrom(String format){
-      Map<String, String> extensions = Maps.newHashMap();
-      extensions.put("BPMN2", "bpmn");
-      extensions.put("RDF", "owl");
-      extensions.put("XES", "xes");
-      extensions.put("XSD", "xsd");
-      return extensions.get(format);
   }
   
 }

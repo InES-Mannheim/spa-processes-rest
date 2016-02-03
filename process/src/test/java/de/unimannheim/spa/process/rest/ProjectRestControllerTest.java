@@ -228,7 +228,7 @@ public class ProjectRestControllerTest {
       final String formatForTest = "BPMN2";
       final String projectIDForTest = createProjectAndReturnID();
       final String processIDForTest = createProcessAndReturnID(projectIDForTest, formatForTest);
-      mockMvc.perform(get("/projects/"+projectIDForTest+"/processes/"+processIDForTest+"/download").param("format", formatForTest))
+      mockMvc.perform(get("/projects/"+projectIDForTest+"/processes/"+processIDForTest))
              .andExpect(status().isOk())
              .andExpect(content().contentType(OCTET_CONTENT_TYPE));
     }
