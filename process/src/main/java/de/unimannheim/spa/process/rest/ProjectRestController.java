@@ -107,6 +107,21 @@ public class ProjectRestController {
                                   .serialize(new MapSerializer());
   }
   
+  @RequestMapping(value="/{projectID}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> removeProject(@PathVariable String projectID){
+      ResponseEntity<Void> response = null;
+      final Optional<Project> projectToRemove = spaService.findProjectById(PROJECT_BASE_URL+projectID);
+      if(projectToRemove.isPresent()){
+        spaService.deleteProject(projectToRemove.get());
+        response = ResponseEntity.ok()
+                                 .build();
+      } else {
+        response = ResponseEntity.notFound()
+                                 .build();
+      }
+      return response;
+  }
+  
   @RequestMapping(value="/{projectID}/processes", method = RequestMethod.GET)
   public ResponseEntity<Map<String, Object>> getAllProcesses(@PathVariable String projectID){
       return spaService.findProjectById(PROJECT_BASE_URL+projectID)
