@@ -87,7 +87,7 @@ public class ProjectRestControllerTest {
     }
     
     @Test
-    public void projectRestcontrollerShouldReturn6Projects() throws Exception{
+    public void projectRestcontrollerShouldReturn0OrMoreProjects() throws Exception{
         mockMvc.perform(get("/projects"))
                .andExpect(status().isOk())
                .andExpect(content().contentType(JSON_CONTENT_TYPE))
