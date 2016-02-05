@@ -87,7 +87,7 @@ public class ProjectRestControllerTest {
     }
     
     @Test
-    public void projectRestcontrollerShouldReturn6Projects() throws Exception{
+    public void projectRestcontrollerShouldReturn0OrMoreProjects() throws Exception{
         mockMvc.perform(get("/projects"))
                .andExpect(status().isOk())
                .andExpect(content().contentType(JSON_CONTENT_TYPE))
@@ -242,5 +242,18 @@ public class ProjectRestControllerTest {
       mockMvc.perform(get("/projects/"+projectIDForTest+"/processes/"+processIDForTest))
              .andExpect(status().isOk())
              .andExpect(content().contentType(OCTET_CONTENT_TYPE));
+    }
+    
+    @Test
+    public void itShouldRemoveAnExistentProject() throws Exception{
+      final String projectIDToRemove = createProjectAndReturnID();
+      mockMvc.perform(delete("/projects/"+projectIDToRemove))
+             .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void itShouldReturnNOTFOUNDForRemoveANonxistentProject() throws Exception{
+      mockMvc.perform(delete("/projects/"+NON_EXISTENT_PROJECT_ID_TO_TEST))
+             .andExpect(status().isNotFound());
     }
 }
