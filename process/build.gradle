@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *          http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,12 +24,14 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath('io.spring.gradle:dependency-management-plugin:0.5.2.RELEASE')
+        classpath('se.transmode.gradle:gradle-docker:1.2')
     }
 }
 
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'docker'
 
 jar {
     baseName = 'spa-rest'
@@ -42,6 +44,20 @@ repositories {
     mavenCentral()
 }
 
+task buildDocker(type: Docker, dependsOn: build) {
+    applicationName = jar.baseName
+    dockerfile = file('../docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
+}
+
+task runDockerContainer(type: Exec, dependsOn: buildDocker){
+    commandLine 'docker', 'run', '--name=spa-rest', '-p', '8080:8080', '-d', 'spa-core/spa-rest'
+}
 
 dependencies {
     compile project(':core')
@@ -56,7 +72,7 @@ dependencies {
         exclude module: "logback-classic"
     }
     compile 'com.google.guava:guava:18.0'
-    
+
     compile 'com.noodlesandwich:rekord-core:0.3'
     compile 'com.noodlesandwich:rekord-jackson:0.3'
 

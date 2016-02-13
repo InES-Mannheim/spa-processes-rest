@@ -1,5 +1,19 @@
 # SPA-REST
 This project is a process domain implementation which uses the SPA Core to manage projects and processes. It exposes several RESTful services which allow the client to create projects, processes, upload process files (BPMN2), among other operations.
+
+## Docker
+To create a docker image of this project, you should run the command below. This command will run the gradle task `buildDocker` which will build the project, create the jar file and build the docker image using the Dockerfile into the folder `docker`.
+
+```Bash
+./gradlew buildDocker
+```
+
+Once the image is created, to run the docker container, use command below. This command will run the gradle task `runDockerContainer` which run the docker images just created exposing the port 8080.
+
+```Bash
+./gradlew runDockerContainer
+```
+
 ## Operations
 |          URL                                |  Method  | Description                                                                                                                                                                                                                               |
 |:-------------------------------------------:|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
