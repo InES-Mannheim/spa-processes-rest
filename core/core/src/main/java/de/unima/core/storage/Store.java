@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *    Copyright 2016 University of Mannheim
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ *******************************************************************************/
 package de.unima.core.storage;
 
 import java.util.Optional;
@@ -7,15 +22,19 @@ import com.google.common.base.Throwables;
 
 /**
  * Common abstraction over several triple stores.
- * 
- * @param <T> id type
  */
 public interface Store {
 
 	/**
 	 * Locks {@link StoreConnection} in read mode.
 	 * 
-	 * @param operation performing a read operation
+	 * <p> A {@code Read} lock indicates that the thread just performs read
+	 * operations, i.e. no data is altered. Thus, multiple threads holding a
+	 * {@code Read} lock may access the database at the same time. However, the
+	 * locking semantics is dependent on the actual implementation.
+	 * 
+	 * @param operation performing a read operation 
+	 * @param <T> result type of the read operation 
 	 * @return operation result
 	 */
 	default <T> Optional<T> readWithConnection(Function<? super StoreConnection, T> operation){
@@ -25,7 +44,12 @@ public interface Store {
 	/**
 	 * Locks {@link StoreConnection} in write mode.
 	 * 
-	 * @param operation performing a read operation
+	 * <p> In order to prevent race conditions, a {@code Write} lock is much
+	 * more greedy than a {@code Read} lock. Depending on the underlying
+	 * implementation this may result into a lock of the complete database.
+	 * 
+	 * @param operation performing a write operation 
+	 * @param <T> result type of the write operation 
 	 * @return operation result
 	 */
 	default <T> Optional<T> writeWithConnection(Function<? super StoreConnection, T> operation){
@@ -39,6 +63,7 @@ public interface Store {
 	 * 
 	 * @param operation which should be executed
 	 * @param lock data access mode; defaults to {@link Lock#WRITE}
+	 * @param <T> result type of the function
 	 * @return function result
 	 * @throws IllegalStateException if any error occurs
 	 */

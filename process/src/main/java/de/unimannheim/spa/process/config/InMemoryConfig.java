@@ -26,7 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import de.unima.core.application.SPA;
-import de.unima.core.application.local.LocalSPA;
+import de.unima.core.application.SPABuilder;
 
 @Configuration
 @Profile("development")
@@ -51,7 +51,7 @@ public class InMemoryConfig {
 
   @Bean(name="SPA")
   public SPA initSPAInSharedMemeoryBean(){
-    return LocalSPA.withDataInSharedMemory();
+    return SPABuilder.local().sharedMemory().build();
   }
 
   public static void main(String[] args) {

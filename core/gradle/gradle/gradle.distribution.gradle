@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
 // Set main class
-mainClassName = "de.unima.core.application.local.LocalSPA"
+mainClassName = "de.unima.core.application.local.SPA"
 
 // Create sources and javadoc
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -24,17 +24,21 @@ jar {
     dependsOn javadocJar
 }
 
-// Add source and javadoc
 distributions {
     main {
         contents {
+           // Add source and javadoc
            from('build/libs'){
               include '*sources.jar'
               include '*javadoc.jar'
               into 'docs'
-           } 
+           }
+           // Add example project and replace placeholders with current values 
            from('example'){
               into 'example'
+              filesMatching('**/build.gradle'){
+	          expand(coreName: "${baseName}", coreVersion: "${version}")
+              }
            }
         }
     }
