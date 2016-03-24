@@ -14,6 +14,12 @@ Once the image is created, to run the docker container, use command below. This 
 ./gradlew runDockerContainer
 ```
 
+The docker image is available through [docker hub](https://hub.docker.com/r/ines/spa-processes-rest/).
+
+```Bash
+docker pull ines/spa-processes-rest
+```
+
 ## Operations
 |          URL                                |  Method  | Description                                                                                                                                                                                                                               |
 |:--------------------------------------------|:--------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
