@@ -1,4 +1,4 @@
-# SPA-REST
+# SPA-Processes-REST
 This project is a process domain implementation which uses the SPA Core to manage projects and processes. It exposes several RESTful services which allow the client to create projects, processes, upload process files (BPMN2), among other operations.
 
 ## Docker
